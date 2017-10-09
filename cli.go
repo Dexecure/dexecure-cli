@@ -203,7 +203,7 @@ func main() {
 						if len(c.Args()) > 0 {
 							id = c.Args().First()
 						} else {
-							fmt.Print("Enter the id of the distribution which you want to clear - ")
+							fmt.Print("Enter the id of the distribution which you want to permanently remove - ")
 							id, _ = reader.ReadString('\n')
 							id = strings.TrimRight(id, "\n")
 						}
@@ -213,23 +213,31 @@ func main() {
 							return nil
 						}
 
-						res, body, err := gorequest.
-							New().
-							Delete(apiEndPoint+"distribution/"+id).
-							Set("Authorization", getToken()).
-							End()
+						fmt.Printf("Going to permanently remove %s distribution. Are you sure? [Y/n] ", id)
+						confirm, _ := reader.ReadByte()
 
-						if err != nil {
-							fmt.Println(err)
-							return nil
-						}
+						if confirm == 'Y' {
 
-						response := parseResponse(body, res)
+							res, body, err := gorequest.
+								New().
+								Delete(apiEndPoint+"distribution/"+id).
+								Set("Authorization", getToken()).
+								End()
 
-						if response.Data != nil {
-							fmt.Println(response.Data["message"])
+							if err != nil {
+								fmt.Println(err)
+								return nil
+							}
+
+							response := parseResponse(body, res)
+
+							if response.Data != nil {
+								fmt.Println(response.Data["message"])
+							} else {
+								fmt.Println("Error: ", response.Error["description"])
+							}
 						} else {
-							fmt.Println("Error: ", response.Error["description"])
+							fmt.Println("Abort mission!")
 						}
 
 						return nil
