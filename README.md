@@ -14,3 +14,16 @@ go get -u github.com/dexecure/dexecure-cli
 PROG=dexecure-cli source $GOPATH/src/gopkg.in/urfave/cli.v1/autocomplete/bash_autocomplete # for bash  
 PROG=dexecure-cli source $GOPATH/src/gopkg.in/urfave/cli.v1/autocomplete/zsh_autocomplete # for zsh  
 
+## Commands available
+dexecure-cli login  
+dexecure-cli logout
+
+dexecure-cli distribution add
+
+dexecure-cli distribution ls  
+dexecure-cli distribution ls your-distribution-uuid
+
+dexecure-cli distribution enable your-distribution-uuid  
+dexecure-cli distribution disable your-distribution-uuid  
+dexecure-cli distribution clear your-distribution-uuid  
+dexecure-cli distribution rm your-distribution-uuid  
