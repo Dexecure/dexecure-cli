@@ -148,7 +148,7 @@ func main() {
 			Usage:   "Logout of your current session",
 			Action: func(c *cli.Context) error {
 				saveToken("")
-				fmt.Println("You have been kicked out.")
+				fmt.Println("You have been logged out.")
 				return nil
 			},
 		},
