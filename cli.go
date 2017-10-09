@@ -184,7 +184,7 @@ func main() {
 						response := parseResponse(body, res)
 
 						if response.Data != nil {
-							fmt.Println("Distribution for", origin, "created!")
+							fmt.Println(response.Data["message"])
 						} else {
 							fmt.Println("Error: ", response.Error["description"])
 						}
