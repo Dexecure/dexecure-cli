@@ -17,6 +17,7 @@ PROG=dexecure-cli source $GOPATH/src/gopkg.in/urfave/cli.v1/autocomplete/zsh_aut
 ## Commands available
 dexecure-cli login  
 dexecure-cli logout
+dexecure-cli usage
 
 dexecure-cli distribution add
 

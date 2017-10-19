@@ -153,6 +153,33 @@ func main() {
 			},
 		},
 		{
+			Name:    "usage",
+			Aliases: []string{"l"},
+			Usage:   "Total bandwidth served via Dexecure across all your distributions",
+			Action: func(c *cli.Context) error {
+				res, body, err := gorequest.
+					New().
+					Get(apiEndPoint+"user/usage").
+					Set("Authorization", getToken()).
+					End()
+
+				if err != nil {
+					fmt.Println(err)
+					return nil
+				}
+
+				response := parseResponse(body, res)
+
+				if response.Data != nil {
+					fmt.Printf("You have used %v bytes this month \n", response.Data["usage"])
+				} else {
+					fmt.Println("Error: ", response.Error["description"])
+				}
+
+				return nil
+			},
+		},
+		{
 			Name:    "distribution",
 			Aliases: []string{"d"},
 			Usage:   "options for managing your dexecure distributions",
