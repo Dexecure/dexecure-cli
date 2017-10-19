@@ -25,12 +25,12 @@ type User struct {
 }
 
 type Distribution struct {
-	Id     string `json:"id"`
-	Origin string `json:"origin"`
-	Name   string `json:"name"`
-	Type   string `json:"type"`
-	Usage  int    `json:"usage"`
-	Status string `json:"status"`
+	Id     string  `json:"id"`
+	Origin string  `json:"origin"`
+	Name   string  `json:"name"`
+	Type   string  `json:"type"`
+	Usage  float64 `json:"usage"`
+	Status string  `json:"status"`
 }
 
 type DistributionList []Distribution
@@ -171,7 +171,7 @@ func main() {
 				response := parseResponse(body, res)
 
 				if response.Data != nil {
-					fmt.Printf("You have used %v bytes this month \n", response.Data["usage"])
+					fmt.Printf("You have used %.2f MB this month \n", response.Data["usage"].(float64)/(1024*1024))
 				} else {
 					fmt.Println("Error: ", response.Error["description"])
 				}
@@ -309,7 +309,7 @@ func main() {
 								fmt.Println("Name: ", distribution.Name)
 								fmt.Println("Type: ", distribution.Type)
 								fmt.Println("Status: ", distribution.Status)
-								fmt.Println("Usage: ", distribution.Usage)
+								fmt.Printf("Usage: %.2f MB \n", distribution.Usage/(1024*1024))
 							} else {
 								fmt.Println("Error: ", response.Error["description"])
 							}
@@ -340,7 +340,7 @@ func main() {
 									fmt.Println("Name: ", distribution.Name)
 									fmt.Println("Type: ", distribution.Type)
 									fmt.Println("Status: ", distribution.Status)
-									fmt.Println("Usage: ", distribution.Usage)
+									fmt.Printf("Usage: %.2f MB \n", distribution.Usage/(1024*1024))
 									fmt.Println("")
 								}
 							} else {
