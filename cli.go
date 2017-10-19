@@ -29,7 +29,7 @@ type Distribution struct {
 	Origin string `json:"origin"`
 	Name   string `json:"name"`
 	Type   string `json:"type"`
-	Usage  string `json:"usage"`
+	Usage  int    `json:"usage"`
 	Status string `json:"status"`
 }
 
@@ -282,6 +282,7 @@ func main() {
 								fmt.Println("Name: ", distribution.Name)
 								fmt.Println("Type: ", distribution.Type)
 								fmt.Println("Status: ", distribution.Status)
+								fmt.Println("Usage: ", distribution.Usage)
 							} else {
 								fmt.Println("Error: ", response.Error["description"])
 							}
@@ -312,6 +313,7 @@ func main() {
 									fmt.Println("Name: ", distribution.Name)
 									fmt.Println("Type: ", distribution.Type)
 									fmt.Println("Status: ", distribution.Status)
+									fmt.Println("Usage: ", distribution.Usage)
 									fmt.Println("")
 								}
 							} else {
