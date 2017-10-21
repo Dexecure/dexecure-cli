@@ -16,11 +16,12 @@ import (
 	"gopkg.in/urfave/cli.v1"
 )
 
-var apiEndPoint = "https://dao-api.dexecure.com/api/v1/"
+var apiEndPoint = "http://localhost:8080/api/v1/"
 
 type User struct {
 	Id       string `json:"id"`
 	UserName string `json:"username"`
+	Email    string `json:"email"`
 	Password string `json:"password"`
 }
 
@@ -107,16 +108,16 @@ func main() {
 			Action: func(c *cli.Context) error {
 				reader := bufio.NewReader(os.Stdin)
 
-				fmt.Print("enter your username: ")
-				username, _ := reader.ReadString('\n')
-				username = strings.TrimRight(username, "\n")
+				fmt.Print("enter your email: ")
+				email, _ := reader.ReadString('\n')
+				email = strings.TrimRight(email, "\n")
 
 				fmt.Print("enter your password:")
 				emoji.Print(":key: ")
 				passwordBytes, _ := gopass.GetPasswd()
 				password := string(passwordBytes[:])
 
-				thisUser := User{UserName: username, Password: password}
+				thisUser := User{Email: email, Password: password}
 
 				res, body, err := gorequest.
 					New().
@@ -134,7 +135,7 @@ func main() {
 				if response.Data != nil {
 					token := response.Data["token"].(string)
 					saveToken(token)
-					fmt.Println("you have been logged in successfully,", username)
+					fmt.Println("you have been logged in successfully,", email)
 				} else {
 					fmt.Println("Error: ", response.Error["description"])
 				}
