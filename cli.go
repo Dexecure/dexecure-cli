@@ -16,7 +16,7 @@ import (
 	"gopkg.in/urfave/cli.v1"
 )
 
-var apiEndPoint = "http://localhost:8080/api/v1/"
+var apiEndPoint = "https://dao-api.dexecure.com/api/v1/"
 
 type User struct {
 	Id       string `json:"id"`
