@@ -74,8 +74,8 @@ func parseResponse(body string, res gorequest.Response) Response {
 		json.Unmarshal([]byte(body), &responseJSON)
 
 		// hack for actionhero validation errors
-		if len(responseJSON["error"].(map[string]interface{})) > 0 {
-			response.Error = responseJSON["error"].(map[string]interface{})
+		if responseJSON["error"].(map[string]interface{})["error"] != nil {
+			response.Error = responseJSON["error"].(map[string]interface{})["error"].(map[string]interface{})
 			return response
 		}
 
