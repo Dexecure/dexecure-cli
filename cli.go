@@ -398,6 +398,7 @@ func main() {
 								New().
 								Post(url).
 								Set("Authorization", getToken()).
+								Send(`{"url": "*"}`).
 								End()
 
 							if err != nil {
