@@ -7,6 +7,8 @@ Tested on Linux and Mac.
 - go get github.com/dexecure/dexecure-cli  
 - go install github.com/dexecure/dexecure-cli  
 
+To use the CLI from anywhere on your terminal, make sure that the bin folder of go is added to your $PATH variable
+
 ## To update
 go get -u github.com/dexecure/dexecure-cli
 
