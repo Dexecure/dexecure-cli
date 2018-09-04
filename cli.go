@@ -13,10 +13,10 @@ import (
 	"github.com/mitchellh/mapstructure"
 	"github.com/parnurzeal/gorequest"
 	"github.com/tucnak/store"
-	"gopkg.in/urfave/cli.v1"
+	"gopkg.in/urfave/cli.v2"
 )
 
-var apiEndPoint = "https://dao-api.dexecure.com/api/v1/"
+var apiEndPoint = "https://dao-dev.dexecure.com/api/v1/"
 
 type User struct {
 	Id       string `json:"id"`
@@ -103,18 +103,18 @@ func parseResponse(body string, res gorequest.Response) Response {
 
 func main() {
 	// var token string = ""
-	app := cli.NewApp()
+	app := &cli.App{}
 
 	app.Name = "Dexecure CLI"
 	app.Usage = "Interact with your Dexecure account"
 	app.Version = "0.0.1"
 	app.Copyright = "Dexecure PTE LTD."
-	app.EnableBashCompletion = true
+	app.EnableShellCompletion = true
 
 	// config management
 	store.Init("dexecure")
 
-	app.Commands = []cli.Command{
+	app.Commands = []*cli.Command{
 		{
 			Name:    "login",
 			Aliases: []string{"a"},
@@ -136,7 +136,7 @@ func main() {
 				res, body, err := gorequest.
 					New().
 					Post(apiEndPoint + "user/login").
-					Send(thisUser).
+					Send( fmt.Sprint(`{"email":"`,thisUser.Email,`", "password":"`,thisUser.Password,`"}`)).
 					End()
 
 				if err != nil {
@@ -198,7 +198,7 @@ func main() {
 			Name:    "distribution",
 			Aliases: []string{"d"},
 			Usage:   "options for managing your dexecure distributions",
-			Subcommands: []cli.Command{
+			Subcommands: []*cli.Command{
 				{
 					Name:  "add",
 					Usage: "add a new Dexecure distribution",
@@ -242,7 +242,7 @@ func main() {
 						var id string
 						reader := bufio.NewReader(os.Stdin)
 
-						if len(c.Args()) > 0 {
+						if c.Args().Len() > 0 {
 							id = c.Args().First()
 						} else {
 							fmt.Print("Enter the id of the distribution which you want to permanently remove - ")
@@ -290,7 +290,7 @@ func main() {
 					Usage: "Get more information about your distribution(s)",
 					Action: func(c *cli.Context) error {
 
-						if len(c.Args()) > 0 {
+						if c.Args().Len() > 0 {
 							// printing information about one particular distribution
 							id := c.Args().First()
 
@@ -375,7 +375,7 @@ func main() {
 						var id string
 						reader := bufio.NewReader(os.Stdin)
 
-						if len(c.Args()) > 0 {
+						if c.Args().Len() > 0 {
 							id = c.Args().First()
 						} else {
 							fmt.Print("Enter the id of the distribution whose cache you want to clear - ")
@@ -429,7 +429,7 @@ func main() {
 						var id string
 						reader := bufio.NewReader(os.Stdin)
 
-						if len(c.Args()) > 0 {
+						if c.Args().Len() > 0 {
 							id = c.Args().First()
 						} else {
 							fmt.Print("Enter the id of the distribution which you want to enable - ")
@@ -482,7 +482,7 @@ func main() {
 						var id string
 						reader := bufio.NewReader(os.Stdin)
 
-						if len(c.Args()) > 0 {
+						if c.Args().Len() > 0 {
 							id = c.Args().First()
 						} else {
 							fmt.Print("Enter the id of the distribution which you want to disable - ")
