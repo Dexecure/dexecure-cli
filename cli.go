@@ -218,6 +218,71 @@ func main() {
 						return nil
 					},
 				},
+				{
+					Name: "add",
+					Usage: "add a new website",
+					Action: func(c *cli.Context) error {
+
+						fmt.Print("Enter the website you want to add :")
+						reader := bufio.NewReader(os.Stdin)
+						origin, _ := reader.ReadString('\n')
+						origin = strings.TrimRight(origin, "\n")
+
+						fmt.Println("Waiting for api info :p",origin)
+						return nil
+					},
+				},
+				{
+					Name:  "rm",
+					Usage: "permanently remove a website",
+					Action: func(c *cli.Context) error {
+
+						var id string
+						reader := bufio.NewReader(os.Stdin)
+
+						if c.Args().Len() > 0 {
+							id = c.Args().First()
+						} else {
+							fmt.Print("Enter the id of the website which you want to permanently remove - ")
+							id, _ = reader.ReadString('\n')
+							id = strings.TrimRight(id, "\n")
+						}
+
+						if IsValidUUID(id) == false {
+							fmt.Println("Please enter a valid website ID. It must be a valid UUID")
+							return nil
+						}
+
+						fmt.Printf("Going to permanently remove %s website. Are you sure? [Y/n] ", id)
+						confirm, _ := reader.ReadByte()
+
+						if confirm == 'Y' {
+							res, body, err := gorequest.
+								New().
+								Delete(apiEndPoint+"website/"+id).
+								Set("Authorization", getToken()).
+								End()
+
+							if err != nil {
+								fmt.Println(err)
+								return nil
+							}
+
+							response := parseResponse(body, res)
+
+							if response.Data != nil {
+								fmt.Println(response.Data["message"])
+							} else {
+								fmt.Println("Error: ", response.Error["description"])
+							}
+
+						} else {
+							fmt.Println("Abort mission!")
+						}
+
+						return nil
+					},
+				},
 			},
 		},
 		{
