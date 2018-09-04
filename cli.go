@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"regexp"
 	"strings"
@@ -17,33 +18,7 @@ import (
 )
 
 var apiEndPoint = "https://dao-dev.dexecure.com/api/v1/"
-
-type User struct {
-	Id       string `json:"id"`
-	UserName string `json:"username"`
-	Email    string `json:"email"`
-	Password string `json:"password"`
-}
-
-type Distribution struct {
-	Id     string  `json:"id"`
-	Origin string  `json:"origin"`
-	Name   string  `json:"name"`
-	Type   string  `json:"type"`
-	Usage  float64 `json:"usage"`
-	Status string  `json:"status"`
-}
-
-type DistributionList []Distribution
-
-type TokenSettings struct {
-	Token string
-}
-
-type Response struct {
-	Data  map[string]interface{}
-	Error map[string]interface{}
-}
+var errorResponse ErrorResponse
 
 func saveToken(token string) {
 	var tokenSettings TokenSettings
@@ -136,7 +111,7 @@ func main() {
 				res, body, err := gorequest.
 					New().
 					Post(apiEndPoint + "user/login").
-					Send( fmt.Sprint(`{"email":"`,thisUser.Email,`", "password":"`,thisUser.Password,`"}`)).
+					Send(fmt.Sprint(`{"email":"`, thisUser.Email, `", "password":"`, thisUser.Password, `"}`)).
 					End()
 
 				if err != nil {
@@ -192,6 +167,57 @@ func main() {
 				}
 
 				return nil
+			},
+		},
+		{
+			Name:    "website",
+			Aliases: []string{"w"},
+			Usage:   "options for managing your website",
+			Subcommands: []*cli.Command{
+				{
+					Name:  "ls",
+					Usage: "Get more information about your website",
+					Action: func(c *cli.Context) error {
+						res, _, err := gorequest.
+							New().
+							Get(apiEndPoint+"website/").
+							Set("Authorization", getToken()).
+							End()
+
+						if err != nil {
+							fmt.Println(err)
+							return nil
+						}
+
+						// Read response body
+						bodystr, er := ioutil.ReadAll(res.Body)
+						if er != nil {
+							return nil
+						}
+
+						// Website Response for /website endpoint
+						var wr WebsiteResponse
+						// first try to Unmarshal expected response
+						er = json.Unmarshal(bodystr, &wr)
+						if er != nil {
+							// if expected response Unmarshalling failed then
+							// try to Unmarshal error
+							er = json.Unmarshal(bodystr, &errorResponse)
+							if er != nil {
+								return nil
+							} else {
+								fmt.Println("Error: ", errorResponse.Error.Description)
+							}
+							return nil
+						}
+
+						for _, website := range wr.Data {
+							fmt.Println(website.WebsiteURL)
+						}
+
+						return nil
+					},
+				},
 			},
 		},
 		{
