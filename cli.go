@@ -11,7 +11,6 @@ import (
 
 	"github.com/howeyc/gopass"
 	"github.com/kyokomi/emoji"
-	"github.com/mitchellh/mapstructure"
 	"github.com/parnurzeal/gorequest"
 	"github.com/tucnak/store"
 	"gopkg.in/urfave/cli.v2"
@@ -186,6 +185,10 @@ func main() {
 						if c.Args().Len() > 0 {
 							id = c.Args().First()
 							id = strings.TrimSpace(id)
+							if IsValidUUID(id) == false {
+								fmt.Println("Please enter a valid website ID. It must be a valid UUID")
+								return nil
+							}
 						}
 						res, _, err := gorequest.
 							New().
@@ -218,9 +221,10 @@ func main() {
 								fmt.Println("Error: ", errorResponse.Error.Description)
 							}
 							return nil
+						} else {
+							fmt.Println("\nTotal number of websites :", len(wr.Data))
 						}
 
-						fmt.Println("\nTotal number of websites :", len(wr.Data))
 						for _, website := range wr.Data {
 							fmt.Println("-----------------------------------------")
 							fmt.Println("ID: ", website.ID)
@@ -358,7 +362,7 @@ func main() {
 							return nil
 						}
 
-						thisDomain := Domain{Origin: origin, WebsiteId: websiteID}
+						thisDomain := DomainRequest{Origin: origin, WebsiteId: websiteID}
 
 						res, body, err := gorequest.
 							New().
@@ -440,76 +444,80 @@ func main() {
 					Usage: "Get more information about your domain(s)",
 					Action: func(c *cli.Context) error {
 
+						id := ""
 						if c.Args().Len() > 0 {
-							// printing information about one particular domain
-							id := c.Args().First()
-
-							url := fmt.Sprintf("%sdistribution/%s", apiEndPoint, id)
-
+							id = c.Args().First()
+							id = strings.TrimSpace(id)
 							if IsValidUUID(id) == false {
-								fmt.Println("Please enter a valid domain ID. It must be a valid UUID")
+								fmt.Println("Please enter a valid website ID. It must be a valid UUID")
+								return nil
+							}
+						}
+
+						res, _, err := gorequest.
+							New().
+							Get(fmt.Sprintf("%sdistribution/%s", apiEndPoint, id)).
+							Set("Authorization", getToken()).
+							End()
+
+						if err != nil {
+							fmt.Println(err)
+							return nil
+						}
+
+						// Read response body
+						body, er := ioutil.ReadAll(res.Body)
+						if er != nil {
+							return nil
+						}
+
+						if c.Args().Len() > 0 {
+							var dr DomainResponse
+							er = json.Unmarshal(body, &dr)
+							if er != nil {
+								// if expected response Unmarshalling failed then
+								// try to Unmarshal error
+								er = json.Unmarshal(body, &errorResponse)
+								if er != nil {
+									return nil
+								} else {
+									fmt.Println("Error: ", errorResponse.Error.Description)
+								}
 								return nil
 							}
 
-							res, body, err := gorequest.
-								New().
-								Get(url).
-								Set("Authorization", getToken()).
-								End()
+							fmt.Println("Id: ", dr.Data.ID)
+							fmt.Println("Origin: ", dr.Data.Origin)
+							fmt.Println("Name: ", dr.Data.Name)
+							fmt.Println("Type: ", dr.Data.Type)
+							fmt.Printf("Usage: %.2f MB \n", dr.Data.Usage/(1024*1024))
+							fmt.Println("")
 
-							if err != nil {
-								fmt.Println(err)
+						} else {
+							var dr DomainsResponse
+							er = json.Unmarshal(body, &dr)
+							if er != nil {
+								// if expected response Unmarshalling failed then
+								// try to Unmarshal error
+								er = json.Unmarshal(body, &errorResponse)
+								if er != nil {
+									return nil
+								} else {
+									fmt.Println("Error: ", errorResponse.Error.Description)
+								}
 								return nil
+							} else {
+								fmt.Println("\nTotal number of websites :", len(dr.Data.Distributions))
 							}
 
-							response := parseResponse(body, res)
-
-							if response.Data != nil {
-								domainMap := response.Data
-								var domain Domain
-								mapstructure.Decode(domainMap, &domain)
-
-								fmt.Println("Id: ", domain.Id)
+							for _, domain := range dr.Data.Distributions {
+								fmt.Println("Id: ", domain.ID)
 								fmt.Println("Origin: ", domain.Origin)
 								fmt.Println("Name: ", domain.Name)
 								fmt.Println("Type: ", domain.Type)
 								fmt.Printf("Usage: %.2f MB \n", domain.Usage/(1024*1024))
-							} else {
-								fmt.Println("Error: ", response.Error["description"])
+								fmt.Println("")
 							}
-
-						} else {
-							// printing list of all your domains
-							res, body, err := gorequest.
-								New().
-								Get(apiEndPoint+"distribution").
-								Set("Authorization", getToken()).
-								End()
-
-							if err != nil {
-								fmt.Println(err)
-								return nil
-							}
-
-							response := parseResponse(body, res)
-
-							if response.Data != nil {
-								var domains DomainList
-								mapstructure.Decode(response.Data["distributions"], &domains)
-
-								fmt.Println("Total number of domains: ", len(domains), "\n")
-								for _, domain := range domains {
-									fmt.Println("Id: ", domain.Id)
-									fmt.Println("Origin: ", domain.Origin)
-									fmt.Println("Name: ", domain.Name)
-									fmt.Println("Type: ", domain.Type)
-									fmt.Printf("Usage: %.2f MB \n", domain.Usage/(1024*1024))
-									fmt.Println("")
-								}
-							} else {
-								fmt.Println("Error: ", response.Error["description"])
-							}
-
 						}
 
 						return nil
