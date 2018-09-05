@@ -9,12 +9,12 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/howeyc/gopass"
-	"github.com/kyokomi/emoji"
 	"github.com/mitchellh/mapstructure"
 	"github.com/parnurzeal/gorequest"
 	"github.com/tucnak/store"
 	"gopkg.in/urfave/cli.v2"
+	"github.com/howeyc/gopass"
+	"github.com/kyokomi/emoji"
 )
 
 var apiEndPoint = "https://dao-dev.dexecure.com/api/v1/"
@@ -76,6 +76,19 @@ func parseResponse(body string, res gorequest.Response) Response {
 	return response
 }
 
+func credentials() (string, string) {
+	reader := bufio.NewReader(os.Stdin)
+
+	fmt.Print("Enter Email: ")
+	email, _ := reader.ReadString('\n')
+
+	fmt.Print("Enter Password:")
+	emoji.Print(":key: ")
+	password,_ := gopass.GetPasswdMasked()
+
+	return strings.TrimSpace(email), string(password[:])
+}
+
 func main() {
 	// var token string = ""
 	app := &cli.App{}
@@ -95,17 +108,7 @@ func main() {
 			Aliases: []string{"a"},
 			Usage:   "Login using your Dexecure credentials",
 			Action: func(c *cli.Context) error {
-				reader := bufio.NewReader(os.Stdin)
-
-				fmt.Print("enter your email: ")
-				email, _ := reader.ReadString('\n')
-				email = strings.TrimRight(email, "\n")
-
-				fmt.Print("enter your password:")
-				emoji.Print(":key: ")
-				passwordBytes, _ := gopass.GetPasswd()
-				password := string(passwordBytes[:])
-
+				email, password := credentials()
 				thisUser := User{Email: email, Password: password}
 
 				res, body, err := gorequest.
@@ -190,7 +193,7 @@ func main() {
 						}
 
 						// Read response body
-						bodystr, er := ioutil.ReadAll(res.Body)
+						body, er := ioutil.ReadAll(res.Body)
 						if er != nil {
 							return nil
 						}
@@ -198,11 +201,11 @@ func main() {
 						// Website Response for /website endpoint
 						var wr WebsiteResponse
 						// first try to Unmarshal expected response
-						er = json.Unmarshal(bodystr, &wr)
+						er = json.Unmarshal(body, &wr)
 						if er != nil {
 							// if expected response Unmarshalling failed then
 							// try to Unmarshal error
-							er = json.Unmarshal(bodystr, &errorResponse)
+							er = json.Unmarshal(body, &errorResponse)
 							if er != nil {
 								return nil
 							} else {
@@ -227,15 +230,15 @@ func main() {
 					Usage: "add a new website",
 					Action: func(c *cli.Context) error {
 
-						fmt.Print("Enter the url you want to add :")
+						fmt.Print("Enter the url you want to add: ")
 						var url string
 						fmt.Scanln(&url)
 
-						fmt.Print(`Enter url Type (magento|wordpress|shopify|none) :`)
+						fmt.Print(`Enter url Type (magento|wordpress|shopify|none): `)
 						var urlType string
 						fmt.Scanln(&urlType)
 
-						fmt.Print("Enter website Name :")
+						fmt.Print("Enter website Name: ")
 						var websiteName string
 						fmt.Scanln(&websiteName)
 
@@ -276,7 +279,7 @@ func main() {
 						if c.Args().Len() > 0 {
 							id = c.Args().First()
 						} else {
-							fmt.Print("Enter the id of the website which you want to permanently remove :")
+							fmt.Print("Enter the id of the website which you want to permanently remove: ")
 							fmt.Scanln(&id)
 						}
 
@@ -285,7 +288,7 @@ func main() {
 							return nil
 						}
 
-						fmt.Printf("Going to permanently remove %s website. Are you sure? [Y/n] :", id)
+						fmt.Printf("Going to permanently remove %s website. Are you sure? [Y/n]: ", id)
 
 						var confirm string
 						fmt.Scanln(&confirm)
