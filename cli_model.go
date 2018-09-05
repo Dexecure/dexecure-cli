@@ -49,3 +49,9 @@ type WebsiteResponse struct {
 		ID          string      `json:"id"`
 	} `json:"data"`
 }
+
+type WebsiteRequest struct {
+	URL         string `json:"url"`
+	UrlType     string `json:"urlType"`
+	WebsiteName string `json:"website_name"`
+}

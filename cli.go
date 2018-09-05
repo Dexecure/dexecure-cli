@@ -212,23 +212,58 @@ func main() {
 						}
 
 						for _, website := range wr.Data {
-							fmt.Println(website.WebsiteURL)
+							fmt.Println("-----------------------------------------")
+							fmt.Println("ID: ", website.ID)
+							fmt.Println("Website URL: ", website.WebsiteURL)
+							fmt.Println("Website Type: ", website.WebsiteType)
+							fmt.Println("Website Name: ", website.WebsiteName)
 						}
 
 						return nil
 					},
 				},
 				{
-					Name: "add",
+					Name:  "add",
 					Usage: "add a new website",
 					Action: func(c *cli.Context) error {
 
-						fmt.Print("Enter the website you want to add :")
-						reader := bufio.NewReader(os.Stdin)
-						origin, _ := reader.ReadString('\n')
-						origin = strings.TrimRight(origin, "\n")
+						fmt.Print("Enter the url you want to add :")
+						var url string
+						fmt.Scanln(&url)
 
-						fmt.Println("Waiting for api info :p",origin)
+						fmt.Print(`Enter url Type (magento|wordpress|shopify|none) :`)
+						var urlType string
+						fmt.Scanln(&urlType)
+
+						fmt.Print("Enter website Name :")
+						var websiteName string
+						fmt.Scanln(&websiteName)
+
+						wr := &WebsiteRequest{URL: url, UrlType: urlType, WebsiteName: websiteName}
+						bdy, er := json.Marshal(wr)
+						if er != nil {
+							fmt.Println(er)
+							return nil
+						}
+
+						res, body, err := gorequest.
+							New().
+							Post(apiEndPoint+"website/").
+							Set("Authorization", getToken()).
+							Send(string(bdy)).
+							End()
+						if err != nil {
+							fmt.Println(err)
+							return nil
+						}
+
+						response := parseResponse(body, res)
+						if response.Data != nil {
+							fmt.Println(response.Data["message"])
+						} else {
+							fmt.Println("Error: ", response.Error["description"])
+						}
+
 						return nil
 					},
 				},
@@ -238,25 +273,24 @@ func main() {
 					Action: func(c *cli.Context) error {
 
 						var id string
-						reader := bufio.NewReader(os.Stdin)
-
 						if c.Args().Len() > 0 {
 							id = c.Args().First()
 						} else {
-							fmt.Print("Enter the id of the website which you want to permanently remove - ")
-							id, _ = reader.ReadString('\n')
-							id = strings.TrimRight(id, "\n")
+							fmt.Print("Enter the id of the website which you want to permanently remove :")
+							fmt.Scanln(&id)
 						}
 
 						if IsValidUUID(id) == false {
-							fmt.Println("Please enter a valid website ID. It must be a valid UUID")
+							fmt.Println("Please enter a valid distribution ID. It must be a valid UUID")
 							return nil
 						}
 
-						fmt.Printf("Going to permanently remove %s website. Are you sure? [Y/n] ", id)
-						confirm, _ := reader.ReadByte()
+						fmt.Printf("Going to permanently remove %s website. Are you sure? [Y/n] :", id)
 
-						if confirm == 'Y' {
+						var confirm string
+						fmt.Scanln(&confirm)
+
+						if strings.ToLower(confirm) == "y" {
 							res, body, err := gorequest.
 								New().
 								Delete(apiEndPoint+"website/"+id).
