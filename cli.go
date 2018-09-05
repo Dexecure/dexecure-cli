@@ -148,7 +148,7 @@ func main() {
 		{
 			Name:    "usage",
 			Aliases: []string{"l"},
-			Usage:   "Total bandwidth served via Dexecure across all your distributions",
+			Usage:   "Total bandwidth served via Dexecure across all your domains",
 			Action: func(c *cli.Context) error {
 				res, body, err := gorequest.
 					New().
@@ -336,11 +336,11 @@ func main() {
 		{
 			Name:    "domain",
 			Aliases: []string{"d"},
-			Usage:   "options for managing your dexecure distributions",
+			Usage:   "options for managing your dexecure domains",
 			Subcommands: []*cli.Command{
 				{
 					Name:  "add",
-					Usage: "add a new Dexecure distribution",
+					Usage: "add a new Dexecure domain",
 					Action: func(c *cli.Context) error {
 
 						fmt.Print("Enter the domain you want to optimize: ")
@@ -354,17 +354,17 @@ func main() {
 						websiteID = strings.TrimSpace(websiteID)
 
 						if IsValidUUID(websiteID) == false {
-							fmt.Println("Please enter a valid distribution ID. It must be a valid UUID")
+							fmt.Println("Please enter a valid domain ID. It must be a valid UUID")
 							return nil
 						}
 
-						thisDistribution := Distribution{Origin: origin, WebsiteId: websiteID}
+						thisDomain := Domain{Origin: origin, WebsiteId: websiteID}
 
 						res, body, err := gorequest.
 							New().
-							Post(apiEndPoint+"distribution").
+							Post(apiEndPoint+"distribution/").
 							Set("Authorization", getToken()).
-							Send(thisDistribution).
+							Send(thisDomain).
 							End()
 
 						if err != nil {
@@ -385,7 +385,7 @@ func main() {
 				},
 				{
 					Name:  "rm",
-					Usage: "permanently removes a distribution",
+					Usage: "permanently removes a domain",
 					Action: func(c *cli.Context) error {
 
 						var id string
@@ -393,17 +393,17 @@ func main() {
 						if c.Args().Len() > 0 {
 							id = c.Args().First()
 						} else {
-							fmt.Print("Enter the id of the distribution which you want to permanently remove: ")
+							fmt.Print("Enter the id of the domain which you want to permanently remove: ")
 							fmt.Scanln(&id)
 							id = strings.TrimSpace(id)
 						}
 
 						if IsValidUUID(id) == false {
-							fmt.Println("Please enter a valid distribution ID. It must be a valid UUID")
+							fmt.Println("Please enter a valid domain ID. It must be a valid UUID")
 							return nil
 						}
 
-						fmt.Printf("Going to permanently remove %s distribution. Are you sure? [Y/n] ", id)
+						fmt.Printf("Going to permanently remove %s domain. Are you sure? [Y/n]: ", id)
 
 						var confirm string
 						fmt.Scanln(&confirm)
@@ -437,17 +437,17 @@ func main() {
 				},
 				{
 					Name:  "ls",
-					Usage: "Get more information about your distribution(s)",
+					Usage: "Get more information about your domain(s)",
 					Action: func(c *cli.Context) error {
 
 						if c.Args().Len() > 0 {
-							// printing information about one particular distribution
+							// printing information about one particular domain
 							id := c.Args().First()
 
-							url := fmt.Sprintf("%sdistribution/%s", apiEndPoint, id)
+							url := fmt.Sprintf("%sdomain/%s", apiEndPoint, id)
 
 							if IsValidUUID(id) == false {
-								fmt.Println("Please enter a valid distribution ID. It must be a valid UUID")
+								fmt.Println("Please enter a valid domain ID. It must be a valid UUID")
 								return nil
 							}
 
@@ -465,22 +465,22 @@ func main() {
 							response := parseResponse(body, res)
 
 							if response.Data != nil {
-								distributionMap := response.Data["distributions"]
-								var distribution Distribution
-								mapstructure.Decode(distributionMap, &distribution)
+								domainMap := response.Data["distributions"]
+								var domain Domain
+								mapstructure.Decode(domainMap, &domain)
 
-								fmt.Println("Id: ", distribution.Id)
-								fmt.Println("Origin: ", distribution.Origin)
-								fmt.Println("Name: ", distribution.Name)
-								fmt.Println("Type: ", distribution.Type)
-								fmt.Println("Status: ", distribution.Status)
-								fmt.Printf("Usage: %.2f MB \n", distribution.Usage/(1024*1024))
+								fmt.Println("Id: ", domain.Id)
+								fmt.Println("Origin: ", domain.Origin)
+								fmt.Println("Name: ", domain.Name)
+								fmt.Println("Type: ", domain.Type)
+								fmt.Println("Status: ", domain.Status)
+								fmt.Printf("Usage: %.2f MB \n", domain.Usage/(1024*1024))
 							} else {
 								fmt.Println("Error: ", response.Error["description"])
 							}
 
 						} else {
-							// printing list of all your distributions
+							// printing list of all your domains
 							res, body, err := gorequest.
 								New().
 								Get(apiEndPoint+"distribution").
@@ -495,17 +495,17 @@ func main() {
 							response := parseResponse(body, res)
 
 							if response.Data != nil {
-								var distributions DistributionList
-								mapstructure.Decode(response.Data["distributions"], &distributions)
+								var domains DomainList
+								mapstructure.Decode(response.Data["distributions"], &domains)
 
-								fmt.Println("Total number of distributions: ", len(distributions), "\n")
-								for _, distribution := range distributions {
-									fmt.Println("Id: ", distribution.Id)
-									fmt.Println("Origin: ", distribution.Origin)
-									fmt.Println("Name: ", distribution.Name)
-									fmt.Println("Type: ", distribution.Type)
-									fmt.Println("Status: ", distribution.Status)
-									fmt.Printf("Usage: %.2f MB \n", distribution.Usage/(1024*1024))
+								fmt.Println("Total number of domains: ", len(domains), "\n")
+								for _, domain := range domains {
+									fmt.Println("Id: ", domain.Id)
+									fmt.Println("Origin: ", domain.Origin)
+									fmt.Println("Name: ", domain.Name)
+									fmt.Println("Type: ", domain.Type)
+									fmt.Println("Status: ", domain.Status)
+									fmt.Printf("Usage: %.2f MB \n", domain.Usage/(1024*1024))
 									fmt.Println("")
 								}
 							} else {
@@ -519,7 +519,7 @@ func main() {
 				},
 				{
 					Name:  "clear",
-					Usage: "Clears the cache for a particular distribution",
+					Usage: "Clears the cache for a particular domain",
 					Action: func(c *cli.Context) error {
 
 						var id string
@@ -527,134 +527,28 @@ func main() {
 						if c.Args().Len() > 0 {
 							id = c.Args().First()
 						} else {
-							fmt.Print("Enter the id of the distribution whose cache you want to clear: ")
+							fmt.Print("Enter the id of the domain whose cache you want to clear: ")
 							fmt.Scanln(&id)
 							id = strings.TrimSpace(id)
 						}
 
 						if IsValidUUID(id) == false {
-							fmt.Println("Please enter a valid distribution ID. It must be a valid UUID")
+							fmt.Println("Please enter a valid domain ID. It must be a valid UUID")
 							return nil
 						}
 
-						fmt.Printf("Going to purge the cache for %s distribution. Are you sure? [Y/n]: ", id)
+						fmt.Printf("Going to purge the cache for %s domain. Are you sure? [Y/n]: ", id)
 						var confirm string
 						fmt.Scanln(&confirm)
 
 						if strings.ToLower(confirm) == "y" {
 
-							url := fmt.Sprintf("%sdistribution/%s/clear", apiEndPoint, id)
+							url := fmt.Sprintf("%sdomain/%s/clear", apiEndPoint, id)
 							res, body, err := gorequest.
 								New().
 								Post(url).
 								Set("Authorization", getToken()).
 								Send(`{"url": "*"}`).
-								End()
-
-							if err != nil {
-								fmt.Println(err)
-								return nil
-							}
-
-							response := parseResponse(body, res)
-
-							if response.Data != nil {
-								fmt.Println(response.Data["message"])
-							} else {
-								fmt.Println("Error: ", response.Error["description"])
-							}
-
-						} else {
-							fmt.Println("Abort mission!")
-						}
-
-						return nil
-					},
-				},
-				{
-					Name:  "enable",
-					Usage: "Enables a previously disabled Dexecure distribution",
-					Action: func(c *cli.Context) error {
-
-						var id string
-						reader := bufio.NewReader(os.Stdin)
-
-						if c.Args().Len() > 0 {
-							id = c.Args().First()
-						} else {
-							fmt.Print("Enter the id of the distribution which you want to enable: ")
-							id, _ = reader.ReadString('\n')
-							id = strings.TrimRight(id, "\n")
-						}
-
-						if IsValidUUID(id) == false {
-							fmt.Println("Please enter a valid distribution ID. It must be a valid UUID")
-							return nil
-						}
-
-						fmt.Printf("Going to enable %s distribution. Are you sure? [Y/n]: ", id)
-						confirm, _ := reader.ReadByte()
-
-						if confirm == 'Y' {
-
-							url := fmt.Sprintf("%sdistribution/%s/enable", apiEndPoint, id)
-							res, body, err := gorequest.
-								New().
-								Post(url).
-								Set("Authorization", getToken()).
-								End()
-
-							if err != nil {
-								fmt.Println(err)
-								return nil
-							}
-
-							response := parseResponse(body, res)
-
-							if response.Data != nil {
-								fmt.Println(response.Data["message"])
-							} else {
-								fmt.Println("Error: ", response.Error["description"])
-							}
-
-						} else {
-							fmt.Println("Abort mission!")
-						}
-
-						return nil
-					},
-				},
-				{
-					Name:  "disable",
-					Usage: "Disables a Dexecure distribution",
-					Action: func(c *cli.Context) error {
-
-						var id string
-						reader := bufio.NewReader(os.Stdin)
-
-						if c.Args().Len() > 0 {
-							id = c.Args().First()
-						} else {
-							fmt.Print("Enter the id of the distribution which you want to disable: ")
-							id, _ = reader.ReadString('\n')
-							id = strings.TrimRight(id, "\n")
-						}
-
-						if IsValidUUID(id) == false {
-							fmt.Println("Please enter a valid distribution ID. It must be a valid UUID")
-							return nil
-						}
-
-						fmt.Printf("Going to disable %s distribution. Are you sure? [Y/n]: ", id)
-						confirm, _ := reader.ReadByte()
-
-						if confirm == 'Y' {
-
-							url := fmt.Sprintf("%sdistribution/%s/disable", apiEndPoint, id)
-							res, body, err := gorequest.
-								New().
-								Post(url).
-								Set("Authorization", getToken()).
 								End()
 
 							if err != nil {

@@ -7,7 +7,7 @@ type User struct {
 	Password string `json:"password"`
 }
 
-type Distribution struct {
+type Domain struct {
 	Id        string  `json:"id"`
 	WebsiteId string  `json:"websiteId"`
 	Origin    string  `json:"origin"`
@@ -17,7 +17,7 @@ type Distribution struct {
 	Status    string  `json:"status"`
 }
 
-type DistributionList []Distribution
+type DomainList []Domain
 
 type TokenSettings struct {
 	Token string
