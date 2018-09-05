@@ -8,12 +8,13 @@ type User struct {
 }
 
 type Distribution struct {
-	Id     string  `json:"id"`
-	Origin string  `json:"origin"`
-	Name   string  `json:"name"`
-	Type   string  `json:"type"`
-	Usage  float64 `json:"usage"`
-	Status string  `json:"status"`
+	Id        string  `json:"id"`
+	WebsiteId string  `json:"websiteId"`
+	Origin    string  `json:"origin"`
+	Name      string  `json:"name"`
+	Type      string  `json:"type"`
+	Usage     float64 `json:"usage"`
+	Status    string  `json:"status"`
 }
 
 type DistributionList []Distribution
