@@ -7,16 +7,47 @@ type User struct {
 	Password string `json:"password"`
 }
 
-type Domain struct {
+/*type Domain struct {
 	Id        string  `json:"id"`
 	WebsiteId string  `json:"websiteId"`
 	Origin    string  `json:"origin"`
 	Name      string  `json:"name"`
 	Type      string  `json:"type"`
 	Usage     float64 `json:"usage"`
+}*/
+
+type DomainsResponse struct {
+	Status int `json:"status"`
+	Error  struct {
+	} `json:"error"`
+	Data struct {
+		Distributions []struct {
+			ID     string  `json:"id"`
+			Origin string  `json:"origin"`
+			Name   string  `json:"name"`
+			Type   string  `json:"type"`
+			Usage  float64 `json:"usage"`
+		} `json:"distributions"`
+	} `json:"data"`
 }
 
-type DomainList []Domain
+type DomainRequest struct {
+	WebsiteId string `json:"websiteId"`
+	Origin    string `json:"origin"`
+}
+
+type DomainResponse struct {
+	Status int `json:"status"`
+	Error  struct {
+	} `json:"error"`
+	Data struct {
+		ID     string  `json:"id"`
+		Origin string  `json:"origin"`
+		Name   string  `json:"name"`
+		Type   string  `json:"type"`
+		Usage  float64 `json:"usage"`
+	} `json:"data"`
+}
 
 type TokenSettings struct {
 	Token string
