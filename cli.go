@@ -242,7 +242,7 @@ func main() {
 						fmt.Scanln(&url)
 						url = strings.TrimSpace(url)
 
-						fmt.Print(`Enter url Type (magento|wordpress|shopify|none): `)
+						fmt.Print(`Enter website type (magento|wordpress|shopify|none): `)
 						var urlType string
 						fmt.Scanln(&urlType)
 						urlType = strings.TrimSpace(urlType)
