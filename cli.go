@@ -537,7 +537,7 @@ func main() {
 							return nil
 						}
 
-						fmt.Printf("Going to delete the cache for %s distribution. Are you sure? [Y/n]: ", id)
+						fmt.Printf("Going to purge the cache for %s distribution. Are you sure? [Y/n]: ", id)
 						var confirm string
 						fmt.Scanln(&confirm)
 
