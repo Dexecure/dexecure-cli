@@ -14,7 +14,6 @@ type Domain struct {
 	Name      string  `json:"name"`
 	Type      string  `json:"type"`
 	Usage     float64 `json:"usage"`
-	Status    string  `json:"status"`
 }
 
 type DomainList []Domain
