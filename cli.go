@@ -465,7 +465,7 @@ func main() {
 							response := parseResponse(body, res)
 
 							if response.Data != nil {
-								domainMap := response.Data["distributions"]
+								domainMap := response.Data
 								var domain Domain
 								mapstructure.Decode(domainMap, &domain)
 
