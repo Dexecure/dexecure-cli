@@ -9,12 +9,12 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/howeyc/gopass"
+	"github.com/kyokomi/emoji"
 	"github.com/mitchellh/mapstructure"
 	"github.com/parnurzeal/gorequest"
 	"github.com/tucnak/store"
 	"gopkg.in/urfave/cli.v2"
-	"github.com/howeyc/gopass"
-	"github.com/kyokomi/emoji"
 )
 
 var apiEndPoint = "https://dao-dev.dexecure.com/api/v1/"
@@ -84,7 +84,7 @@ func credentials() (string, string) {
 
 	fmt.Print("Enter Password:")
 	emoji.Print(":key: ")
-	password,_ := gopass.GetPasswdMasked()
+	password, _ := gopass.GetPasswdMasked()
 
 	return strings.TrimSpace(email), string(password[:])
 }
@@ -181,9 +181,15 @@ func main() {
 					Name:  "ls",
 					Usage: "Get more information about your website",
 					Action: func(c *cli.Context) error {
+
+						id := ""
+						if c.Args().Len() > 0 {
+							id = c.Args().First()
+							id = strings.TrimSpace(id)
+						}
 						res, _, err := gorequest.
 							New().
-							Get(apiEndPoint+"website/").
+							Get(fmt.Sprintf("%swebsite/%s", apiEndPoint, id)).
 							Set("Authorization", getToken()).
 							End()
 
@@ -214,6 +220,7 @@ func main() {
 							return nil
 						}
 
+						fmt.Println("\nTotal number of websites :", len(wr.Data))
 						for _, website := range wr.Data {
 							fmt.Println("-----------------------------------------")
 							fmt.Println("ID: ", website.ID)
@@ -233,14 +240,17 @@ func main() {
 						fmt.Print("Enter the url you want to add: ")
 						var url string
 						fmt.Scanln(&url)
+						url = strings.TrimSpace(url)
 
 						fmt.Print(`Enter url Type (magento|wordpress|shopify|none): `)
 						var urlType string
 						fmt.Scanln(&urlType)
+						urlType = strings.TrimSpace(urlType)
 
 						fmt.Print("Enter website Name: ")
 						var websiteName string
 						fmt.Scanln(&websiteName)
+						websiteName = strings.TrimSpace(websiteName)
 
 						wr := &WebsiteRequest{URL: url, UrlType: urlType, WebsiteName: websiteName}
 						bdy, er := json.Marshal(wr)
@@ -281,10 +291,11 @@ func main() {
 						} else {
 							fmt.Print("Enter the id of the website which you want to permanently remove: ")
 							fmt.Scanln(&id)
+							id = strings.TrimSpace(id)
 						}
 
 						if IsValidUUID(id) == false {
-							fmt.Println("Please enter a valid distribution ID. It must be a valid UUID")
+							fmt.Println("Please enter a valid website ID. It must be a valid UUID")
 							return nil
 						}
 
@@ -323,7 +334,7 @@ func main() {
 			},
 		},
 		{
-			Name:    "distribution",
+			Name:    "domain",
 			Aliases: []string{"d"},
 			Usage:   "options for managing your dexecure distributions",
 			Subcommands: []*cli.Command{
@@ -332,12 +343,22 @@ func main() {
 					Usage: "add a new Dexecure distribution",
 					Action: func(c *cli.Context) error {
 
-						fmt.Print("Enter the domain you want to optimize - ")
-						reader := bufio.NewReader(os.Stdin)
-						origin, _ := reader.ReadString('\n')
-						origin = strings.TrimRight(origin, "\n")
+						fmt.Print("Enter the domain you want to optimize: ")
+						var origin string
+						fmt.Scanln(&origin)
+						origin = strings.TrimSpace(origin)
 
-						thisDistribution := Distribution{Origin: origin}
+						fmt.Print("Enter Website ID (UUID): ")
+						var websiteID string
+						fmt.Scanln(&websiteID)
+						websiteID = strings.TrimSpace(websiteID)
+
+						if IsValidUUID(websiteID) == false {
+							fmt.Println("Please enter a valid distribution ID. It must be a valid UUID")
+							return nil
+						}
+
+						thisDistribution := Distribution{Origin: origin, WebsiteId: websiteID}
 
 						res, body, err := gorequest.
 							New().
@@ -368,14 +389,13 @@ func main() {
 					Action: func(c *cli.Context) error {
 
 						var id string
-						reader := bufio.NewReader(os.Stdin)
 
 						if c.Args().Len() > 0 {
 							id = c.Args().First()
 						} else {
-							fmt.Print("Enter the id of the distribution which you want to permanently remove - ")
-							id, _ = reader.ReadString('\n')
-							id = strings.TrimRight(id, "\n")
+							fmt.Print("Enter the id of the distribution which you want to permanently remove: ")
+							fmt.Scanln(&id)
+							id = strings.TrimSpace(id)
 						}
 
 						if IsValidUUID(id) == false {
@@ -384,9 +404,11 @@ func main() {
 						}
 
 						fmt.Printf("Going to permanently remove %s distribution. Are you sure? [Y/n] ", id)
-						confirm, _ := reader.ReadByte()
 
-						if confirm == 'Y' {
+						var confirm string
+						fmt.Scanln(&confirm)
+
+						if strings.ToLower(confirm) == "y" {
 
 							res, body, err := gorequest.
 								New().
@@ -497,18 +519,17 @@ func main() {
 				},
 				{
 					Name:  "clear",
-					Usage: "Clears the cahce for a particular distribution",
+					Usage: "Clears the cache for a particular distribution",
 					Action: func(c *cli.Context) error {
 
 						var id string
-						reader := bufio.NewReader(os.Stdin)
 
 						if c.Args().Len() > 0 {
 							id = c.Args().First()
 						} else {
-							fmt.Print("Enter the id of the distribution whose cache you want to clear - ")
-							id, _ = reader.ReadString('\n')
-							id = strings.TrimRight(id, "\n")
+							fmt.Print("Enter the id of the distribution whose cache you want to clear: ")
+							fmt.Scanln(&id)
+							id = strings.TrimSpace(id)
 						}
 
 						if IsValidUUID(id) == false {
@@ -516,10 +537,11 @@ func main() {
 							return nil
 						}
 
-						fmt.Printf("Going to delete the cache for %s distribution. Are you sure? [Y/n] ", id)
-						confirm, _ := reader.ReadByte()
+						fmt.Printf("Going to delete the cache for %s distribution. Are you sure? [Y/n]: ", id)
+						var confirm string
+						fmt.Scanln(&confirm)
 
-						if confirm == 'Y' {
+						if strings.ToLower(confirm) == "y" {
 
 							url := fmt.Sprintf("%sdistribution/%s/clear", apiEndPoint, id)
 							res, body, err := gorequest.
@@ -560,7 +582,7 @@ func main() {
 						if c.Args().Len() > 0 {
 							id = c.Args().First()
 						} else {
-							fmt.Print("Enter the id of the distribution which you want to enable - ")
+							fmt.Print("Enter the id of the distribution which you want to enable: ")
 							id, _ = reader.ReadString('\n')
 							id = strings.TrimRight(id, "\n")
 						}
@@ -570,7 +592,7 @@ func main() {
 							return nil
 						}
 
-						fmt.Printf("Going to enable %s distribution. Are you sure? [Y/n] ", id)
+						fmt.Printf("Going to enable %s distribution. Are you sure? [Y/n]: ", id)
 						confirm, _ := reader.ReadByte()
 
 						if confirm == 'Y' {
@@ -613,7 +635,7 @@ func main() {
 						if c.Args().Len() > 0 {
 							id = c.Args().First()
 						} else {
-							fmt.Print("Enter the id of the distribution which you want to disable - ")
+							fmt.Print("Enter the id of the distribution which you want to disable: ")
 							id, _ = reader.ReadString('\n')
 							id = strings.TrimRight(id, "\n")
 						}
@@ -623,7 +645,7 @@ func main() {
 							return nil
 						}
 
-						fmt.Printf("Going to disable %s distribution. Are you sure? [Y/n] ", id)
+						fmt.Printf("Going to disable %s distribution. Are you sure? [Y/n]: ", id)
 						confirm, _ := reader.ReadByte()
 
 						if confirm == 'Y' {
