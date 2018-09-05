@@ -444,7 +444,7 @@ func main() {
 							// printing information about one particular domain
 							id := c.Args().First()
 
-							url := fmt.Sprintf("%sdomain/%s", apiEndPoint, id)
+							url := fmt.Sprintf("%sdistribution/%s", apiEndPoint, id)
 
 							if IsValidUUID(id) == false {
 								fmt.Println("Please enter a valid domain ID. It must be a valid UUID")
@@ -473,7 +473,6 @@ func main() {
 								fmt.Println("Origin: ", domain.Origin)
 								fmt.Println("Name: ", domain.Name)
 								fmt.Println("Type: ", domain.Type)
-								fmt.Println("Status: ", domain.Status)
 								fmt.Printf("Usage: %.2f MB \n", domain.Usage/(1024*1024))
 							} else {
 								fmt.Println("Error: ", response.Error["description"])
@@ -504,7 +503,6 @@ func main() {
 									fmt.Println("Origin: ", domain.Origin)
 									fmt.Println("Name: ", domain.Name)
 									fmt.Println("Type: ", domain.Type)
-									fmt.Println("Status: ", domain.Status)
 									fmt.Printf("Usage: %.2f MB \n", domain.Usage/(1024*1024))
 									fmt.Println("")
 								}
@@ -543,7 +541,7 @@ func main() {
 
 						if strings.ToLower(confirm) == "y" {
 
-							url := fmt.Sprintf("%sdomain/%s/clear", apiEndPoint, id)
+							url := fmt.Sprintf("%sdistribution/%s/clear", apiEndPoint, id)
 							res, body, err := gorequest.
 								New().
 								Post(url).
