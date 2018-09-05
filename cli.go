@@ -542,36 +542,78 @@ func main() {
 							fmt.Println("Please enter a valid domain ID. It must be a valid UUID")
 							return nil
 						}
+						fmt.Println("Please choose a option :-")
+						fmt.Println("\t1.Clear cache for entire domain")
+						fmt.Println("\t2.Clear cache by relative urls(*******/asset/script.js)")
+						fmt.Print("How do you want to clean (1/2): ")
 
-						fmt.Printf("Going to purge the cache for %s domain. Are you sure? [Y/n]: ", id)
-						var confirm string
-						fmt.Scanln(&confirm)
+						var fc int
+						fmt.Scanln(&fc)
 
-						if strings.ToLower(confirm) == "y" {
+						if fc == 1 {
+							fmt.Printf("Going to purge the cache for %s domain. Are you sure? [Y/n]: ", id)
+							var confirm string
+							fmt.Scanln(&confirm)
 
-							url := fmt.Sprintf("%sdistribution/%s/clear", apiEndPoint, id)
-							res, body, err := gorequest.
-								New().
-								Post(url).
-								Set("Authorization", getToken()).
-								Send(`{"url": "*"}`).
-								End()
+							if strings.ToLower(confirm) == "y" {
 
-							if err != nil {
-								fmt.Println(err)
-								return nil
-							}
+								url := fmt.Sprintf("%sdistribution/%s/clear", apiEndPoint, id)
+								res, body, err := gorequest.
+									New().
+									Post(url).
+									Set("Authorization", getToken()).
+									Send(`{"url": "*"}`).
+									End()
 
-							response := parseResponse(body, res)
+								if err != nil {
+									fmt.Println(err)
+									return nil
+								}
 
-							if response.Data != nil {
-								fmt.Println(response.Data["message"])
+								response := parseResponse(body, res)
+
+								if response.Data != nil {
+									fmt.Println(response.Data["message"])
+								} else {
+									fmt.Println("Error: ", response.Error["description"])
+								}
+
 							} else {
-								fmt.Println("Error: ", response.Error["description"])
+								fmt.Println("Abort mission!")
 							}
+						} else if fc == 2 {
+							fmt.Print("Input relative urls(separated by ','): ")
+							var urls string
+							fmt.Scanln(&urls)
+							fmt.Printf("\nGoing to purge the cache for %s urls from %s domain. Are you sure? [Y/n]: ", urls, id)
 
-						} else {
-							fmt.Println("Abort mission!")
+							var confirm string
+							fmt.Scanln(&confirm)
+
+							if strings.ToLower(confirm) == "y" {
+								url := fmt.Sprintf("%sdistribution/%s/clear", apiEndPoint, id)
+								res, body, err := gorequest.
+									New().
+									Post(url).
+									Set("Authorization", getToken()).
+									Send(fmt.Sprintf(`{"url": "%s"}`, urls)).
+									End()
+
+								if err != nil {
+									fmt.Println(err)
+									return nil
+								}
+
+								response := parseResponse(body, res)
+
+								if response.Data != nil {
+									fmt.Println(response.Data["message"])
+								} else {
+									fmt.Println("Error: ", response.Error["description"])
+								}
+							} else {
+								fmt.Println("Abort mission!")
+							}
 						}
 
 						return nil
