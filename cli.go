@@ -562,7 +562,7 @@ func main() {
 									New().
 									Post(url).
 									Set("Authorization", getToken()).
-									Send(`{"url": "*"}`).
+									Send(`{"url": ["/*"]}`).
 									End()
 
 								if err != nil {
@@ -591,12 +591,15 @@ func main() {
 							fmt.Scanln(&confirm)
 
 							if strings.ToLower(confirm) == "y" {
+
+								urlB, _ := json.Marshal(strings.Split(urls, ","))
+
 								url := fmt.Sprintf("%sdistribution/%s/clear", apiEndPoint, id)
 								res, body, err := gorequest.
 									New().
 									Post(url).
 									Set("Authorization", getToken()).
-									Send(fmt.Sprintf(`{"url": "%s"}`, urls)).
+									Send(fmt.Sprintf(`{"url": %s}`, string(urlB))).
 									End()
 
 								if err != nil {
