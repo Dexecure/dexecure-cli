@@ -19,14 +19,18 @@ type User struct {
 type DomainsResponse struct {
 	Status int `json:"status"`
 	Error  struct {
+		Code        int    `json:"code"`
+		Description string `json:"description"`
+		Parameter   string `json:"parameter"`
 	} `json:"error"`
 	Data struct {
 		Distributions []struct {
-			ID     string  `json:"id"`
-			Origin string  `json:"origin"`
-			Name   string  `json:"name"`
-			Type   string  `json:"type"`
-			Usage  float64 `json:"usage"`
+			ID        string  `json:"id"`
+			Origin    string  `json:"origin"`
+			Name      string  `json:"name"`
+			Type      string  `json:"type"`
+			Usage     float64 `json:"usage"`
+			WebsiteID string  `json:"websiteId"`
 		} `json:"distributions"`
 	} `json:"data"`
 }
@@ -39,6 +43,9 @@ type DomainRequest struct {
 type DomainResponse struct {
 	Status int `json:"status"`
 	Error  struct {
+		Code        int    `json:"code"`
+		Description string `json:"description"`
+		Parameter   string `json:"parameter"`
 	} `json:"error"`
 	Data struct {
 		ID     string  `json:"id"`
