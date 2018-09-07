@@ -554,6 +554,64 @@ func main() {
 								return nil
 							},
 						},
+						{
+							Name:  "id",
+							Usage: "information about your domain",
+							Action: func(c *cli.Context) error {
+								id := ""
+								if c.Args().Len() > 0 {
+									id = c.Args().First()
+									id = strings.TrimSpace(id)
+								} else {
+									fmt.Print("Domain ID: ")
+									fmt.Scanln(&id)
+								}
+								if IsValidUUID(id) == false {
+									fmt.Println("Please enter a valid website ID. It must be a valid UUID")
+									return nil
+								}
+								res, _, err := gorequest.
+									New().
+									Get(fmt.Sprintf("%sdistribution/%s", apiEndPoint, id)).
+									Set("Authorization", getToken()).
+									End()
+
+								if err != nil {
+									fmt.Println(err)
+									return nil
+								}
+
+								// Read response body
+								body, er := ioutil.ReadAll(res.Body)
+								if er != nil {
+									return nil
+								}
+								var dr DomainResponse
+								er = json.Unmarshal(body, &dr)
+								if er != nil || dr.Error.Code != 0 {
+									// if expected response Unmarshalling failed then
+									// try to Unmarshal error
+									er = json.Unmarshal(body, &errorResponse)
+									if er != nil {
+										return nil
+									} else {
+										fmt.Println("Error: ", errorResponse.Error.Description)
+									}
+									return nil
+								}
+
+								fmt.Println("")
+								fmt.Println("-----------------------------------------")
+								fmt.Println("Id: ", dr.Data.ID)
+								fmt.Println("Origin: ", dr.Data.Origin)
+								fmt.Println("Name: ", dr.Data.Name)
+								fmt.Println("Type: ", dr.Data.Type)
+								fmt.Printf("Usage: %.2f MB \n", dr.Data.Usage/(1024*1024))
+								fmt.Println("-----------------------------------------")
+
+								return nil
+							},
+						},
 					},
 				},
 				{
