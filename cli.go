@@ -491,96 +491,69 @@ func main() {
 									return nil
 								}
 
+								fmt.Println("")
 								fmt.Println("Id: ", dr.Data.Distributions[0].ID)
 								fmt.Println("Origin: ", dr.Data.Distributions[0].Origin)
 								fmt.Println("Name: ", dr.Data.Distributions[0].Name)
 								fmt.Println("Type: ", dr.Data.Distributions[0].Type)
 								fmt.Printf("Usage: %.2f MB \n", dr.Data.Distributions[0].Usage/(1024*1024))
-								fmt.Println("")
 
 								return nil
 							},
 						},
-					},
-					Action: func(c *cli.Context) error {
+						{
+							Name:  "all",
+							Usage: "domain for specific website",
+							Action: func(c *cli.Context) error {
 
-						id := ""
-						if c.Args().Len() > 0 {
-							id = c.Args().First()
-							id = strings.TrimSpace(id)
-							if IsValidUUID(id) == false {
-								fmt.Println("Please enter a valid website ID. It must be a valid UUID")
-								return nil
-							}
-						}
+								res, _, err := gorequest.
+									New().
+									Get(fmt.Sprintf("%sdistribution/", apiEndPoint)).
+									Set("Authorization", getToken()).
+									End()
 
-						res, _, err := gorequest.
-							New().
-							Get(fmt.Sprintf("%sdistribution/%s", apiEndPoint, id)).
-							Set("Authorization", getToken()).
-							End()
+								if err != nil {
+									fmt.Println(err)
+									return nil
+								}
 
-						if err != nil {
-							fmt.Println(err)
-							return nil
-						}
-
-						// Read response body
-						body, er := ioutil.ReadAll(res.Body)
-						if er != nil {
-							return nil
-						}
-
-						if c.Args().Len() > 0 {
-							var dr DomainResponse
-							er = json.Unmarshal(body, &dr)
-							if er != nil {
-								// if expected response Unmarshalling failed then
-								// try to Unmarshal error
-								er = json.Unmarshal(body, &errorResponse)
+								// Read response body
+								body, er := ioutil.ReadAll(res.Body)
 								if er != nil {
 									return nil
-								} else {
-									fmt.Println("Error: ", errorResponse.Error.Description)
 								}
-								return nil
-							}
 
-							fmt.Println("Id: ", dr.Data.ID)
-							fmt.Println("Origin: ", dr.Data.Origin)
-							fmt.Println("Name: ", dr.Data.Name)
-							fmt.Println("Type: ", dr.Data.Type)
-							fmt.Printf("Usage: %.2f MB \n", dr.Data.Usage/(1024*1024))
-							fmt.Println("")
-
-						} else {
-							var dr DomainsResponse
-							er = json.Unmarshal(body, &dr)
-							if er != nil {
-								// if expected response Unmarshalling failed then
-								// try to Unmarshal error
-								er = json.Unmarshal(body, &errorResponse)
-								if er != nil {
+								var dr DomainsResponse
+								er = json.Unmarshal(body, &dr)
+								if er != nil || dr.Error.Code != 0 {
+									// if expected response Unmarshalling failed then
+									// try to Unmarshal error
+									er = json.Unmarshal(body, &errorResponse)
+									if er != nil {
+										return nil
+									} else {
+										fmt.Println("Error: ", errorResponse.Error.Description)
+									}
 									return nil
 								} else {
-									fmt.Println("Error: ", errorResponse.Error.Description)
+									fmt.Println("\nTotal number of websites :", len(dr.Data.Distributions))
 								}
-								return nil
-							} else {
-								fmt.Println("\nTotal number of websites :", len(dr.Data.Distributions))
-							}
 
-							for _, domain := range dr.Data.Distributions {
-								fmt.Println("Id: ", domain.ID)
-								fmt.Println("Origin: ", domain.Origin)
-								fmt.Println("Name: ", domain.Name)
-								fmt.Println("Type: ", domain.Type)
-								fmt.Printf("Usage: %.2f MB \n", domain.Usage/(1024*1024))
 								fmt.Println("")
-							}
-						}
+								for _, domain := range dr.Data.Distributions {
+									fmt.Println("-----------------------------------------")
+									fmt.Println("Id: ", domain.ID)
+									fmt.Println("Origin: ", domain.Origin)
+									fmt.Println("Website ID: ", domain.WebsiteID)
+									fmt.Println("Name: ", domain.Name)
+									fmt.Println("Type: ", domain.Type)
+									fmt.Printf("Usage: %.2f MB \n", domain.Usage/(1024*1024))
+								}
+								fmt.Println("-----------------------------------------")
 
-						return nil
+								return nil
+							},
+						},
 					},
 				},
 				{
