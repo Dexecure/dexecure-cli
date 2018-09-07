@@ -503,7 +503,7 @@ func main() {
 						},
 						{
 							Name:  "all",
-							Usage: "domain for specific website",
+							Usage: "information about your domain(s)",
 							Action: func(c *cli.Context) error {
 
 								res, _, err := gorequest.
