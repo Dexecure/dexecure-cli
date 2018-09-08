@@ -265,7 +265,7 @@ func main() {
 
 						res, body, err := gorequest.
 							New().
-							Post(apiEndPoint+"website/").
+							Post(apiEndPoint+"website").
 							Set("Authorization", getToken()).
 							Send(string(bdy)).
 							End()
@@ -366,7 +366,7 @@ func main() {
 
 						res, body, err := gorequest.
 							New().
-							Post(apiEndPoint+"distribution/").
+							Post(apiEndPoint+"distribution").
 							Set("Authorization", getToken()).
 							Send(thisDomain).
 							End()
