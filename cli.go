@@ -94,7 +94,7 @@ func main() {
 
 	app.Name = "Dexecure CLI"
 	app.Usage = "Interact with your Dexecure account"
-	app.Version = "0.0.1"
+	app.Version = "0.0.2"
 	app.Copyright = "Dexecure PTE LTD."
 	app.EnableShellCompletion = true
 
