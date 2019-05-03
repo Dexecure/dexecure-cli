@@ -35,7 +35,7 @@ func getToken() string {
 }
 
 func IsValidUUID(uuid string) bool {
-	r := regexp.MustCompile("^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-4[a-fA-F0-9]{3}-[8|9|aA|bB][a-fA-F0-9]{3}-[a-fA-F0-9]{12}$")
+	r := regexp.MustCompile("^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[8|9|aA|bB][a-fA-F0-9]{3}-[a-fA-F0-9]{12}$")
 	return r.MatchString(uuid)
 }
 
@@ -56,15 +56,21 @@ func parseResponse(body string, res gorequest.Response) Response {
 		}
 
 		// hack 2 for actionhero validation errors
-		if responseJSON["error"].(map[string]interface{})["error"] != nil {
-			response.Error = responseJSON["error"].(map[string]interface{})["error"].(map[string]interface{})
+		if responseJSON["error"] != nil {
+			response.Error = responseJSON["error"].(map[string]interface{})
 			return response
 		}
 
 		responseStatus := responseJSON["status"].(float64)
 
 		if responseStatus == 200 {
-			response.Data = responseJSON["data"].(map[string]interface{})
+			_, ok := responseJSON["data"].(string)
+			if ok {
+				response.Data = make(map[string]interface{})
+				response.Data["message"] = responseJSON["data"].(string)
+			} else {
+				response.Data = responseJSON["data"].(map[string]interface{})
+			}
 		} else {
 			response.Error = responseJSON["error"].(map[string]interface{})
 		}
@@ -489,15 +495,20 @@ func main() {
 										fmt.Println("Error: ", errorResponse.Error.Description)
 									}
 									return nil
+								} else {
+									fmt.Println("\nDomains in this website:", len(dr.Data.Distributions))
 								}
 
 								fmt.Println("")
-								fmt.Println("Id: ", dr.Data.Distributions[0].ID)
-								fmt.Println("Origin: ", dr.Data.Distributions[0].Origin)
-								fmt.Println("Name: ", dr.Data.Distributions[0].Name)
-								fmt.Println("Type: ", dr.Data.Distributions[0].Type)
-								fmt.Printf("Usage: %.2f MB \n", dr.Data.Distributions[0].Usage/(1024*1024))
-
+								for _, domain := range dr.Data.Distributions {
+									fmt.Println("-----------------------------------------")
+									fmt.Println("Id: ", domain.ID)
+									fmt.Println("Origin: ", domain.Origin)
+									fmt.Println("Name: ", domain.Name)
+									fmt.Println("Type: ", domain.Type)
+									fmt.Printf("Usage: %.2f MB \n", domain.Usage/(1024*1024))
+								}
+								fmt.Println("-----------------------------------------")
 								return nil
 							},
 						},
@@ -536,7 +547,7 @@ func main() {
 									}
 									return nil
 								} else {
-									fmt.Println("\nTotal number of websites :", len(dr.Data.Distributions))
+									fmt.Println("\nTotal number of domains:", len(dr.Data.Distributions))
 								}
 
 								fmt.Println("")
