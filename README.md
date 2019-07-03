@@ -10,7 +10,7 @@ Tested on Linux and Mac.
 
 To use the CLI from anywhere on your terminal, make sure that the bin folder of go is added to your $PATH variable
 
-## To update
+## To update the CLI
 
 go get -u github.com/dexecure/dexecure-cli
 
