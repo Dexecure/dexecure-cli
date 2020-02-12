@@ -9,14 +9,12 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/howeyc/gopass"
-	"github.com/kyokomi/emoji"
 	"github.com/parnurzeal/gorequest"
 	"github.com/tucnak/store"
 	"gopkg.in/urfave/cli.v2"
 )
 
-var apiEndPoint = "https://dao-api.dexecure.com/api/v1/"
+var apiEndPoint = "https://dao-dev.dexecure.com/api/v1/"
 var errorResponse ErrorResponse
 
 func saveToken(token string) {
@@ -81,17 +79,13 @@ func parseResponse(body string, res gorequest.Response) Response {
 	return response
 }
 
-func credentials() (string, string) {
+func credentials() string {
 	reader := bufio.NewReader(os.Stdin)
 
-	fmt.Print("Enter Email: ")
-	email, _ := reader.ReadString('\n')
+	fmt.Print("Enter your api token (Visit https://app.dexecure.com/profile?display=api-tokens to generate a token if you don't have one already): ")
+	apiTokens, _ := reader.ReadString('\n')
 
-	fmt.Print("Enter Password:")
-	emoji.Print(":key: ")
-	password, _ := gopass.GetPasswdMasked()
-
-	return strings.TrimSpace(email), string(password[:])
+	return strings.TrimSpace(apiTokens)
 }
 
 func main() {
@@ -109,44 +103,17 @@ func main() {
 
 	app.Commands = []*cli.Command{
 		{
-			Name:    "login",
-			Aliases: []string{"a"},
-			Usage:   "Login using your Dexecure credentials",
+			Name:    "configure",
+			Aliases: []string{"c"},
+			Usage:   "Add your Dexecure api-tokens",
 			Action: func(c *cli.Context) error {
-				email, password := credentials()
-				thisUser := User{Email: email, Password: password}
-
-				res, body, err := gorequest.
-					New().
-					Post(apiEndPoint + "user/login").
-					Send(fmt.Sprint(`{"email":"`, thisUser.Email, `", "password":"`, thisUser.Password, `"}`)).
-					End()
-
-				if err != nil {
-					fmt.Println(err)
-					return nil
-				}
-
-				response := parseResponse(body, res)
-
-				if response.Data != nil {
-					token := response.Data["token"].(string)
-					saveToken(token)
-					fmt.Println("you have been logged in successfully,", email)
+				apiTokens := credentials()
+				if apiTokens != "" {
+					saveToken(apiTokens)
+					fmt.Println("API tokens saved successfully")
 				} else {
-					fmt.Println("Error: ", response.Error["description"])
+					fmt.Println("empty API tokens")
 				}
-
-				return nil
-			},
-		},
-		{
-			Name:    "logout",
-			Aliases: []string{"l"},
-			Usage:   "Logout of your current session",
-			Action: func(c *cli.Context) error {
-				saveToken("")
-				fmt.Println("You have been logged out.")
 				return nil
 			},
 		},
