@@ -495,15 +495,20 @@ func main() {
 									fmt.Println("\nDomains in this website:", len(dr.Data.Distributions))
 								}
 
-								fmt.Println("")
-								for _, domain := range dr.Data.Distributions {
+								if dr.Error.Description != "" {
+									fmt.Println(dr.Error.Description)
+								} else {
+									fmt.Println("")
+									for _, domain := range dr.Data.Distributions {
+										fmt.Println("-----------------------------------------")
+										fmt.Println("Id: ", domain.ID)
+										fmt.Println("Origin: ", domain.Origin)
+										fmt.Println("Name: ", domain.Name)
+										fmt.Println("Type: ", domain.Type)
+									}
 									fmt.Println("-----------------------------------------")
-									fmt.Println("Id: ", domain.ID)
-									fmt.Println("Origin: ", domain.Origin)
-									fmt.Println("Name: ", domain.Name)
-									fmt.Println("Type: ", domain.Type)
 								}
-								fmt.Println("-----------------------------------------")
+
 								return nil
 							},
 						},
@@ -545,16 +550,21 @@ func main() {
 									fmt.Println("\nTotal number of domains:", len(dr.Data.Distributions))
 								}
 
-								fmt.Println("")
-								for _, domain := range dr.Data.Distributions {
+								if dr.Error.Description != "" {
+									fmt.Println(dr.Error.Description)
+								} else {
+									fmt.Println("")
+									for _, domain := range dr.Data.Distributions {
+										fmt.Println("-----------------------------------------")
+										fmt.Println("Id: ", domain.ID)
+										fmt.Println("Origin: ", domain.Origin)
+										fmt.Println("Website ID: ", domain.WebsiteID)
+										fmt.Println("Name: ", domain.Name)
+										fmt.Println("Type: ", domain.Type)
+									}
 									fmt.Println("-----------------------------------------")
-									fmt.Println("Id: ", domain.ID)
-									fmt.Println("Origin: ", domain.Origin)
-									fmt.Println("Website ID: ", domain.WebsiteID)
-									fmt.Println("Name: ", domain.Name)
-									fmt.Println("Type: ", domain.Type)
 								}
-								fmt.Println("-----------------------------------------")
+
 								return nil
 							},
 						},
@@ -604,10 +614,14 @@ func main() {
 									return nil
 								}
 
-								fmt.Println("")
-								fmt.Println("-----------------------------------------")
-								printDomain(dr.Data)
-								fmt.Println("-----------------------------------------")
+								if dr.Error.Description != "" {
+									fmt.Println(dr.Error.Description)
+								} else {
+									fmt.Println("")
+									fmt.Println("-----------------------------------------")
+									printDomain(dr.Data)
+									fmt.Println("-----------------------------------------")
+								}
 
 								return nil
 							},
