@@ -15,6 +15,8 @@ import (
 )
 
 var apiEndPoint = "https://dao-dev.dexecure.com/api/v1/"
+
+// var apiEndPoint = "https://dao-api.dexecure.com/api/v1/"
 var errorResponse ErrorResponse
 
 func saveToken(token string) {
@@ -122,7 +124,26 @@ func main() {
 			Aliases: []string{"l"},
 			Usage:   "Total bandwidth served via Dexecure across all your domains",
 			Action: func(c *cli.Context) error {
-				res, body, err := gorequest.
+				res, _, err := gorequest.
+					New().
+					Get(apiEndPoint+"user").
+					Set("Authorization", getToken()).
+					End()
+
+				if err != nil {
+					fmt.Println(err)
+					return nil
+				}
+
+				// Read response body
+				bdy, er := ioutil.ReadAll(res.Body)
+				if er != nil {
+					return er
+				}
+				var user UserResponse
+				er = json.Unmarshal(bdy, &user)
+
+				res, _, err = gorequest.
 					New().
 					Get(apiEndPoint+"user/usage").
 					Set("Authorization", getToken()).
@@ -133,13 +154,21 @@ func main() {
 					return nil
 				}
 
-				response := parseResponse(body, res)
-
-				if response.Data != nil {
-					fmt.Printf("You have used %.2f MB this month \n", response.Data["usage"].(float64)/(1024*1024))
-				} else {
-					fmt.Println("Error: ", response.Error["description"])
+				// Read response body
+				bdy, er = ioutil.ReadAll(res.Body)
+				if er != nil {
+					return er
 				}
+
+				var usage UsageResponse
+				er = json.Unmarshal(bdy, &usage)
+
+				fmt.Println("Bandwidth Used:")
+				fmt.Println(usage.Data.Bandwidth/(1024*1024), "MB of", user.Data.Plan.MaxBandwidth, "GB")
+				fmt.Println("Number of Requests:")
+				fmt.Println(usage.Data.Requests, "of", user.Data.Plan.MaxRequests)
+				fmt.Println("Number of Distributions Used:")
+				fmt.Println(usage.Data.Distributions, "of", user.Data.Plan.MaxDistributions)
 
 				return nil
 			},
@@ -473,7 +502,6 @@ func main() {
 									fmt.Println("Origin: ", domain.Origin)
 									fmt.Println("Name: ", domain.Name)
 									fmt.Println("Type: ", domain.Type)
-									fmt.Printf("Usage: %.2f MB \n", domain.Usage/(1024*1024))
 								}
 								fmt.Println("-----------------------------------------")
 								return nil
@@ -525,10 +553,8 @@ func main() {
 									fmt.Println("Website ID: ", domain.WebsiteID)
 									fmt.Println("Name: ", domain.Name)
 									fmt.Println("Type: ", domain.Type)
-									fmt.Printf("Usage: %.2f MB \n", domain.Usage/(1024*1024))
 								}
 								fmt.Println("-----------------------------------------")
-
 								return nil
 							},
 						},
@@ -580,11 +606,7 @@ func main() {
 
 								fmt.Println("")
 								fmt.Println("-----------------------------------------")
-								fmt.Println("Id: ", dr.Data.ID)
-								fmt.Println("Origin: ", dr.Data.Origin)
-								fmt.Println("Name: ", dr.Data.Name)
-								fmt.Println("Type: ", dr.Data.Type)
-								fmt.Printf("Usage: %.2f MB \n", dr.Data.Usage/(1024*1024))
+								printDomain(dr.Data)
 								fmt.Println("-----------------------------------------")
 
 								return nil
@@ -696,4 +718,53 @@ func main() {
 	}
 
 	app.Run(os.Args)
+}
+
+func printDomain(dt Data) {
+	fmt.Println("Id: ", dt.ID)
+	fmt.Println("Origin: ", dt.Origin)
+	fmt.Println("Name: ", dt.Name)
+	fmt.Println("Type: ", dt.Type)
+	fmt.Println("Status: ", dt.Status)
+	fmt.Println("WebsiteID: ", dt.WebsiteID)
+	fmt.Println("Region: ", dt.Region)
+	fmt.Println("RootPath: ", dt.RootPath)
+	fmt.Println("CNames: ", strings.Join(dt.CNames, ", "))
+	fmt.Println("JsEnabled: ", dt.JsEnabled)
+	fmt.Println("CSSEnabled: ", dt.CSSEnabled)
+	fmt.Println("ImageEnabled: ", dt.ImageEnabled)
+	fmt.Println("SVGEnabled: ", dt.SVGEnabled)
+	fmt.Println("FontEnabled: ", dt.FontEnabled)
+	fmt.Println("ProxyEnabled: ", dt.ProxyEnabled)
+	fmt.Println("CacheControlImmutable: ", dt.CacheControlImmutable)
+	fmt.Println("GIFEnabled: ", dt.GIFEnabled)
+	fmt.Println("DefaultCacheTime: ", dt.DefaultCacheTime)
+	fmt.Println("Rules: ")
+	fmt.Println("*******")
+	for _, rule := range dt.Rules {
+		fmt.Println("Pattern: ", rule.Pattern)
+		fmt.Println("Actions: ", strings.Join(rule.Actions, ", "))
+		fmt.Println("*******")
+	}
+	fmt.Println("AutoResize: ", dt.AutoResize)
+	fmt.Println("AutoRotate: ", dt.AutoRotate)
+	fmt.Println("HeifEnabled: ", dt.HeifEnabled)
+	fmt.Println("TextDetection: ", dt.TextDetection)
+	fmt.Println("FaceDetection: ", dt.FaceDetection)
+	fmt.Println("Zopflipng: ", dt.Zopflipng)
+	fmt.Println("ServerError: ")
+	fmt.Println("*******")
+	for code, se := range dt.ErrorCaching.ServerError {
+		fmt.Println(code, ":", se)
+	}
+	fmt.Println("*******")
+	fmt.Println("ClientError: ")
+	fmt.Println("*******")
+	fmt.Println("Default: ", dt.ErrorCaching.ClientError.Default)
+	fmt.Println("*******")
+	fmt.Println("LinkCanonical: ", dt.LinkCanonical)
+	fmt.Println("S3BucketIsOrigin: ", dt.S3BucketIsOrigin)
+	fmt.Println("S3Bucket Name: ", dt.S3Bucket.Name)
+	fmt.Println("S3Bucket Region: ", dt.S3Bucket.Region)
+
 }
