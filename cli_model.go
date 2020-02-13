@@ -117,14 +117,13 @@ type ErrorResponse struct {
 }
 
 type WebsiteResponse struct {
-	Status int `json:"status"`
-	Error  struct {
-	} `json:"error"`
-	Data []struct {
-		WebsiteURL  string      `json:"website_url"`
-		WebsiteType string      `json:"website_type"`
-		WebsiteName interface{} `json:"website_name"`
-		ID          string      `json:"id"`
+	Status int         `json:"status"`
+	Error  interface{} `json:"error"`
+	Data   struct {
+		WebsiteURL  string `json:"website_url"`
+		WebsiteType string `json:"website_type"`
+		WebsiteName string `json:"website_name"`
+		ID          string `json:"id"`
 	} `json:"data"`
 }
 

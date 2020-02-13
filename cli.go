@@ -14,9 +14,9 @@ import (
 	"gopkg.in/urfave/cli.v2"
 )
 
-// var apiEndPoint = "https://dao-dev.dexecure.com/api/v1/"
+var apiEndPoint = "https://dao-dev.dexecure.com/api/v1/"
 
-var apiEndPoint = "https://dao-api.dexecure.com/api/v1/"
+// var apiEndPoint = "https://dao-api.dexecure.com/api/v1/"
 var errorResponse ErrorResponse
 
 func saveToken(token string) {
@@ -223,17 +223,13 @@ func main() {
 								fmt.Println("Error: ", errorResponse.Error.Description)
 							}
 							return nil
-						} else {
-							fmt.Println("\nTotal number of websites :", len(wr.Data))
 						}
 
-						for _, website := range wr.Data {
-							fmt.Println("-----------------------------------------")
-							fmt.Println("ID: ", website.ID)
-							fmt.Println("Website URL: ", website.WebsiteURL)
-							fmt.Println("Website Type: ", website.WebsiteType)
-							fmt.Println("Website Name: ", website.WebsiteName)
-						}
+						fmt.Println("-----------------------------------------")
+						fmt.Println("ID: ", wr.Data.ID)
+						fmt.Println("Website URL: ", wr.Data.WebsiteURL)
+						fmt.Println("Website Type: ", wr.Data.WebsiteType)
+						fmt.Println("Website Name: ", wr.Data.WebsiteName)
 
 						return nil
 					},
