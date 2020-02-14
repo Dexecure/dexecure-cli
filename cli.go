@@ -179,57 +179,120 @@ func main() {
 				{
 					Name:  "ls",
 					Usage: "Get more information about your website",
-					Action: func(c *cli.Context) error {
+					Subcommands: []*cli.Command{
+						{
+							Name:  "id",
+							Usage: "information about your website",
+							Action: func(c *cli.Context) error {
 
-						id := ""
-						if c.Args().Len() > 0 {
-							id = c.Args().First()
-							id = strings.TrimSpace(id)
-							if IsValidUUID(id) == false {
-								fmt.Println("Please enter a valid website ID. It must be a valid UUID")
+								id := ""
+								if c.Args().Len() > 0 {
+									id = c.Args().First()
+									id = strings.TrimSpace(id)
+									if IsValidUUID(id) == false {
+										fmt.Println("Please enter a valid website ID. It must be a valid UUID")
+										return nil
+									}
+								}
+								res, _, err := gorequest.
+									New().
+									Get(fmt.Sprintf("%swebsite/%s", apiEndPoint, id)).
+									Set("Authorization", getToken()).
+									End()
+
+								if err != nil {
+									fmt.Println(err)
+									return nil
+								}
+
+								// Read response body
+								body, er := ioutil.ReadAll(res.Body)
+								if er != nil {
+									return nil
+								}
+
+								// Website Response for /website endpoint
+								var wr WebsiteResponse
+								// first try to Unmarshal expected response
+								er = json.Unmarshal(body, &wr)
+								if er != nil {
+									// if expected response Unmarshalling failed then
+									// try to Unmarshal error
+									er = json.Unmarshal(body, &errorResponse)
+									if er != nil {
+										return nil
+									} else {
+										fmt.Println("Error: ", errorResponse.Error.Description)
+									}
+									return nil
+								}
+
+								fmt.Println("-----------------------------------------")
+								fmt.Println("ID: ", wr.Data.ID)
+								fmt.Println("Website URL: ", wr.Data.WebsiteURL)
+								fmt.Println("Website Type: ", wr.Data.WebsiteType)
+								fmt.Println("Website Name: ", wr.Data.WebsiteName)
+
 								return nil
-							}
-						}
-						res, _, err := gorequest.
-							New().
-							Get(fmt.Sprintf("%swebsite/%s", apiEndPoint, id)).
-							Set("Authorization", getToken()).
-							End()
+							},
+						},
+						{
+							Name:  "all",
+							Usage: "information about your website(s)",
+							Action: func(c *cli.Context) error {
 
-						if err != nil {
-							fmt.Println(err)
-							return nil
-						}
+								res, _, err := gorequest.
+									New().
+									Get(fmt.Sprintf("%swebsite/", apiEndPoint)).
+									Set("Authorization", getToken()).
+									End()
 
-						// Read response body
-						body, er := ioutil.ReadAll(res.Body)
-						if er != nil {
-							return nil
-						}
+								if err != nil {
+									fmt.Println(err)
+									return nil
+								}
 
-						// Website Response for /website endpoint
-						var wr WebsiteResponse
-						// first try to Unmarshal expected response
-						er = json.Unmarshal(body, &wr)
-						if er != nil {
-							// if expected response Unmarshalling failed then
-							// try to Unmarshal error
-							er = json.Unmarshal(body, &errorResponse)
-							if er != nil {
+								// Read response body
+								body, er := ioutil.ReadAll(res.Body)
+								if er != nil {
+									return nil
+								}
+
+								// Website Response for /website endpoint
+								var wr WebsitesResponse
+								// first try to Unmarshal expected response
+								er = json.Unmarshal(body, &wr)
+								if er != nil {
+									// if expected response Unmarshalling failed then
+									// try to Unmarshal error
+									er = json.Unmarshal(body, &errorResponse)
+									if er != nil {
+										return nil
+									} else {
+										fmt.Println("Error: ", errorResponse.Error.Description)
+									}
+									return nil
+								} else {
+									fmt.Println("\nTotal number of website:", len(wr.Data))
+								}
+
+								if wr.Error.Description != "" {
+									fmt.Println(wr.Error.Description)
+								} else {
+									fmt.Println("")
+									for _, website := range wr.Data {
+										fmt.Println("-----------------------------------------")
+										fmt.Println("ID: ", website.ID)
+										fmt.Println("Website URL: ", website.WebsiteURL)
+										fmt.Println("Website Type: ", website.WebsiteType)
+										fmt.Println("Website Name: ", website.WebsiteName)
+									}
+									fmt.Println("-----------------------------------------")
+								}
+
 								return nil
-							} else {
-								fmt.Println("Error: ", errorResponse.Error.Description)
-							}
-							return nil
-						}
-
-						fmt.Println("-----------------------------------------")
-						fmt.Println("ID: ", wr.Data.ID)
-						fmt.Println("Website URL: ", wr.Data.WebsiteURL)
-						fmt.Println("Website Type: ", wr.Data.WebsiteType)
-						fmt.Println("Website Name: ", wr.Data.WebsiteName)
-
-						return nil
+							},
+						},
 					},
 				},
 				{
@@ -734,7 +797,9 @@ func printDomain(dt Data) {
 	fmt.Println("Name: ", dt.Name)
 	fmt.Println("Type: ", dt.Type)
 	fmt.Println("Status: ", dt.Status)
-	fmt.Println("WebsiteID: ", dt.WebsiteID)
+	if dt.WebsiteID != "" {
+		fmt.Println("WebsiteID: ", dt.WebsiteID)
+	}
 	fmt.Println("Region: ", dt.Region)
 	fmt.Println("RootPath: ", dt.RootPath)
 	fmt.Println("CNames: ", strings.Join(dt.CNames, ", "))
