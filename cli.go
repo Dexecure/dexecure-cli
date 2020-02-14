@@ -14,9 +14,7 @@ import (
 	"gopkg.in/urfave/cli.v2"
 )
 
-var apiEndPoint = "https://dao-dev.dexecure.com/api/v1/"
-
-// var apiEndPoint = "https://dao-api.dexecure.com/api/v1/"
+var apiEndPoint = "https://dao-api.dexecure.com/api/v1/"
 var errorResponse ErrorResponse
 
 func saveToken(token string) {
