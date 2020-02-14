@@ -82,7 +82,7 @@ func parseResponse(body string, res gorequest.Response) Response {
 func credentials() string {
 	reader := bufio.NewReader(os.Stdin)
 
-	fmt.Print("Enter your api token (Visit https://app.dexecure.com/profile?display=api-tokens to generate a token if you don't have one already): ")
+	fmt.Print("Enter your api token (Visit https://app.dexecure.com/profile?display=api-tokens to generate a token if you don't have one already). Entering an empty token will clear any stored API tokens in this session: ")
 	apiTokens, _ := reader.ReadString('\n')
 
 	return strings.TrimSpace(apiTokens)
@@ -94,7 +94,7 @@ func main() {
 
 	app.Name = "Dexecure CLI"
 	app.Usage = "Interact with your Dexecure account"
-	app.Version = "0.0.2"
+	app.Version = "0.0.3"
 	app.Copyright = "Dexecure PTE LTD."
 	app.EnableShellCompletion = true
 
@@ -116,10 +116,10 @@ func main() {
 		{
 			Name:    "usage",
 			Aliases: []string{"l"},
-			Usage:   "Total bandwidth served via Dexecure across all your domains",
+			Usage:   "Your Dexecure usage for this month",
 			Action: func(c *cli.Context) error {
 				if getToken() == "" {
-					fmt.Println("API token not found please run \"dexecure-cli configure\"")
+					fmt.Println("API token not found. Please run \"dexecure-cli configure\"")
 					return nil
 				}
 				res, _, err := gorequest.
@@ -185,7 +185,7 @@ func main() {
 							Usage: "information about your website",
 							Action: func(c *cli.Context) error {
 								if getToken() == "" {
-									fmt.Println("API token not found please run \"dexecure-cli configure\"")
+									fmt.Println("API token not found. Please run \"dexecure-cli configure\"")
 									return nil
 								}
 
@@ -242,10 +242,10 @@ func main() {
 						},
 						{
 							Name:  "all",
-							Usage: "information about your website(s)",
+							Usage: "Information about all your websites",
 							Action: func(c *cli.Context) error {
 								if getToken() == "" {
-									fmt.Println("API token not found please run \"dexecure-cli configure\"")
+									fmt.Println("API token not found. Please run \"dexecure-cli configure\"")
 									return nil
 								}
 								res, _, err := gorequest.
@@ -280,7 +280,7 @@ func main() {
 									}
 									return nil
 								} else {
-									fmt.Println("\nTotal number of website:", len(wr.Data))
+									fmt.Println("\nTotal number of websites:", len(wr.Data))
 								}
 
 								if wr.Error.Description != "" {
@@ -352,14 +352,14 @@ func main() {
 				},
 				{
 					Name:  "rm",
-					Usage: "permanently remove a website",
+					Usage: "Permanently delete a website",
 					Action: func(c *cli.Context) error {
 
 						var id string
 						if c.Args().Len() > 0 {
 							id = c.Args().First()
 						} else {
-							fmt.Print("Enter the id of the website which you want to permanently remove: ")
+							fmt.Print("Enter the id of the website which you want to permanently delete: ")
 							fmt.Scanln(&id)
 							id = strings.TrimSpace(id)
 						}
@@ -369,7 +369,7 @@ func main() {
 							return nil
 						}
 
-						fmt.Printf("Going to permanently remove %s website. Are you sure? [Y/n]: ", id)
+						fmt.Printf("Going to permanently delete %s website. Are you sure? [Y/n]: ", id)
 
 						var confirm string
 						fmt.Scanln(&confirm)
@@ -413,7 +413,7 @@ func main() {
 					Usage: "add a new Dexecure domain",
 					Action: func(c *cli.Context) error {
 						if getToken() == "" {
-							fmt.Println("API token not found please run \"dexecure-cli configure\"")
+							fmt.Println("API token not found. Please run \"dexecure-cli configure\"")
 							return nil
 						}
 						fmt.Print("Enter the domain you want to optimize: ")
@@ -427,7 +427,7 @@ func main() {
 						websiteID = strings.TrimSpace(websiteID)
 
 						if IsValidUUID(websiteID) == false {
-							fmt.Println("Please enter a valid domain ID. It must be a valid UUID")
+							fmt.Println("Please enter a valid website ID. It must be a valid UUID")
 							return nil
 						}
 
@@ -458,10 +458,10 @@ func main() {
 				},
 				{
 					Name:  "rm",
-					Usage: "permanently removes a domain",
+					Usage: "Permanently delete a domain",
 					Action: func(c *cli.Context) error {
 						if getToken() == "" {
-							fmt.Println("API token not found please run \"dexecure-cli configure\"")
+							fmt.Println("API token not found. Please run \"dexecure-cli configure\"")
 							return nil
 						}
 						var id string
@@ -469,7 +469,7 @@ func main() {
 						if c.Args().Len() > 0 {
 							id = c.Args().First()
 						} else {
-							fmt.Print("Enter the id of the domain which you want to permanently remove: ")
+							fmt.Print("Enter the id of the domain which you want to permanently delete: ")
 							fmt.Scanln(&id)
 							id = strings.TrimSpace(id)
 						}
@@ -479,7 +479,7 @@ func main() {
 							return nil
 						}
 
-						fmt.Printf("Going to permanently remove %s domain. Are you sure? [Y/n]: ", id)
+						fmt.Printf("Going to permanently delete %s domain. Are you sure? [Y/n]: ", id)
 
 						var confirm string
 						fmt.Scanln(&confirm)
@@ -517,10 +517,10 @@ func main() {
 					Subcommands: []*cli.Command{
 						{
 							Name:  "website",
-							Usage: "domain for specific website",
+							Usage: "List domains present in a specific website",
 							Action: func(c *cli.Context) error {
 								if getToken() == "" {
-									fmt.Println("API token not found please run \"dexecure-cli configure\"")
+									fmt.Println("API token not found. Please run \"dexecure-cli configure\"")
 									return nil
 								}
 
@@ -589,11 +589,11 @@ func main() {
 						},
 						{
 							Name:  "all",
-							Usage: "information about your domain(s)",
+							Usage: "Information about your domain(s)",
 							Action: func(c *cli.Context) error {
 
 								if getToken() == "" {
-									fmt.Println("API token not found please run \"dexecure-cli configure\"")
+									fmt.Println("API token not found. Please run \"dexecure-cli configure\"")
 									return nil
 								}
 
@@ -650,10 +650,10 @@ func main() {
 						},
 						{
 							Name:  "id",
-							Usage: "information about your domain",
+							Usage: "Information about your domain",
 							Action: func(c *cli.Context) error {
 								if getToken() == "" {
-									fmt.Println("API token not found please run \"dexecure-cli configure\"")
+									fmt.Println("API token not found. Please run \"dexecure-cli configure\"")
 									return nil
 								}
 
@@ -666,7 +666,7 @@ func main() {
 									fmt.Scanln(&id)
 								}
 								if IsValidUUID(id) == false {
-									fmt.Println("Please enter a valid website ID. It must be a valid UUID")
+									fmt.Println("Please enter a valid domain ID. It must be a valid UUID")
 									return nil
 								}
 								res, _, err := gorequest.
@@ -719,7 +719,7 @@ func main() {
 					Action: func(c *cli.Context) error {
 
 						if getToken() == "" {
-							fmt.Println("API token not found please run \"dexecure-cli configure\"")
+							fmt.Println("API token not found. Please run \"dexecure-cli configure\"")
 							return nil
 						}
 
