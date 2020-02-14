@@ -225,9 +225,8 @@ func main() {
 									er = json.Unmarshal(body, &errorResponse)
 									if er != nil {
 										return nil
-									} else {
-										fmt.Println("Error: ", errorResponse.Error.Description)
 									}
+									fmt.Println("Error: ", errorResponse.Error.Description)
 									return nil
 								}
 
@@ -275,13 +274,11 @@ func main() {
 									er = json.Unmarshal(body, &errorResponse)
 									if er != nil {
 										return nil
-									} else {
-										fmt.Println("Error: ", errorResponse.Error.Description)
 									}
+									fmt.Println("Error: ", errorResponse.Error.Description)
 									return nil
-								} else {
-									fmt.Println("\nTotal number of websites:", len(wr.Data))
 								}
+								fmt.Println("\nTotal number of websites:", len(wr.Data))
 
 								if wr.Error.Description != "" {
 									fmt.Println(wr.Error.Description)
@@ -562,13 +559,11 @@ func main() {
 									er = json.Unmarshal(body, &errorResponse)
 									if er != nil {
 										return nil
-									} else {
-										fmt.Println("Error: ", errorResponse.Error.Description)
 									}
+									fmt.Println("Error: ", errorResponse.Error.Description)
 									return nil
-								} else {
-									fmt.Println("\nDomains in this website:", len(dr.Data.Distributions))
 								}
+								fmt.Println("\nDomains in this website:", len(dr.Data.Distributions))
 
 								if dr.Error.Description != "" {
 									fmt.Println(dr.Error.Description)
@@ -622,13 +617,11 @@ func main() {
 									er = json.Unmarshal(body, &errorResponse)
 									if er != nil {
 										return nil
-									} else {
-										fmt.Println("Error: ", errorResponse.Error.Description)
 									}
+									fmt.Println("Error: ", errorResponse.Error.Description)
 									return nil
-								} else {
-									fmt.Println("\nTotal number of domains:", len(dr.Data.Distributions))
 								}
+								fmt.Println("\nTotal number of domains:", len(dr.Data.Distributions))
 
 								if dr.Error.Description != "" {
 									fmt.Println(dr.Error.Description)
@@ -693,9 +686,8 @@ func main() {
 									er = json.Unmarshal(body, &errorResponse)
 									if er != nil {
 										return nil
-									} else {
-										fmt.Println("Error: ", errorResponse.Error.Description)
 									}
+									fmt.Println("Error: ", errorResponse.Error.Description)
 									return nil
 								}
 
