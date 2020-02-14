@@ -108,12 +108,8 @@ func main() {
 			Usage:   "Add your Dexecure api-tokens",
 			Action: func(c *cli.Context) error {
 				apiTokens := credentials()
-				if apiTokens != "" {
-					saveToken(apiTokens)
-					fmt.Println("API tokens saved successfully")
-				} else {
-					fmt.Println("empty API tokens")
-				}
+				saveToken(apiTokens)
+				fmt.Println("API tokens saved successfully")
 				return nil
 			},
 		},
@@ -122,6 +118,10 @@ func main() {
 			Aliases: []string{"l"},
 			Usage:   "Total bandwidth served via Dexecure across all your domains",
 			Action: func(c *cli.Context) error {
+				if getToken() == "" {
+					fmt.Println("API token not found please run \"dexecure-cli configure\"")
+					return nil
+				}
 				res, _, err := gorequest.
 					New().
 					Get(apiEndPoint+"user").
@@ -394,6 +394,12 @@ func main() {
 						return nil
 					},
 				},
+			},
+			Action: func(c *cli.Context) error {
+				if getToken() == "" {
+					fmt.Println("API token not found please run \"dexecure-cli configure\"")
+				}
+				return nil
 			},
 		},
 		{
@@ -791,6 +797,12 @@ func main() {
 						return nil
 					},
 				},
+			},
+			Action: func(c *cli.Context) error {
+				if getToken() == "" {
+					fmt.Println("API token not found please run \"dexecure-cli configure\"")
+				}
+				return nil
 			},
 		},
 	}
