@@ -8,7 +8,7 @@ Tested on Linux and Mac.
 - go get github.com/dexecure/dexecure-cli
 - go install github.com/dexecure/dexecure-cli
 
-To use the CLI from anywhere on your terminal, make sure that the bin folder of go is added to your $PATH variable
+To use the CLI from anywhere on your terminal, make sure that the bin folder of go is added to your \$PATH variable
 
 ## To update the CLI
 
@@ -21,8 +21,8 @@ PROG=dexecure-cli source $GOPATH/src/gopkg.in/urfave/cli.v1/autocomplete/zsh_aut
 
 ## Commands available
 
-dexecure-cli login  
-dexecure-cli logout  
+dexecure-cli configure
+
 dexecure-cli usage
 
 dexecure-cli domain add
@@ -36,5 +36,5 @@ dexecure-cli domain clear your-domain-uuid
 dexecure-cli domain rm your-domain-uuid
 
 dexecure-cli website add  
-dexecure-cli website ls your-website-uuid  
+dexecure-cli website ls id your-website-uuid  
 dexecure-cli website rm your-website-uuid
