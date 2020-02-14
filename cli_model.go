@@ -127,6 +127,21 @@ type WebsiteResponse struct {
 	} `json:"data"`
 }
 
+type WebsitesResponse struct {
+	Status int         `json:"status"`
+	Error  struct {
+		Code        int    `json:"code"`
+		Description string `json:"description"`
+		Parameter   string `json:"parameter"`
+	} `json:"error"`
+	Data   []struct {
+		WebsiteURL  string `json:"website_url"`
+		WebsiteType string `json:"website_type"`
+		WebsiteName string `json:"website_name"`
+		ID          string `json:"id"`
+	} `json:"data"`
+}
+
 type WebsiteRequest struct {
 	URL         string `json:"url"`
 	UrlType     string `json:"urlType"`
