@@ -746,7 +746,10 @@ func main() {
 						} else if fc == 2 {
 							fmt.Print("Input relative urls(separated by ','): ")
 							var urls string
-							fmt.Scanln(&urls)
+							scanner := bufio.NewScanner(os.Stdin)
+							if scanner.Scan() {
+								urls = scanner.Text()
+							}
 							fmt.Printf("\nGoing to purge the cache for %s urls from %s domain. Are you sure? [Y/n]: ", urls, id)
 
 							var confirm string
@@ -754,7 +757,11 @@ func main() {
 
 							if strings.ToLower(confirm) == "y" {
 
-								urlB, _ := json.Marshal(strings.Split(urls, ","))
+								urlSlice := strings.Split(urls, ",")
+								for i := range urlSlice {
+									urlSlice[i] = strings.TrimSpace(urlSlice[i])
+								}
+								urlB, _ := json.Marshal(urlSlice)
 
 								url := fmt.Sprintf("%sdistribution/%s/clear", apiEndPoint, id)
 								res, body, err := gorequest.
