@@ -32,7 +32,7 @@ func getToken() string {
 	return tokenSettings.Token
 }
 
-func IsValidUUID(uuid string) bool {
+func isValidUUID(uuid string) bool {
 	r := regexp.MustCompile("^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[8|9|aA|bB][a-fA-F0-9]{3}-[a-fA-F0-9]{12}$")
 	return r.MatchString(uuid)
 }
@@ -82,7 +82,7 @@ func parseResponse(body string, res gorequest.Response) Response {
 func credentials() string {
 	reader := bufio.NewReader(os.Stdin)
 
-	fmt.Print("Enter your api token (Visit https://app.dexecure.com/profile?display=api-tokens to generate a token if you don't have one already). Entering an empty token will clear any stored API tokens in this session: ")
+	fmt.Print("Enter your api token (Visit https://app.dexecure.com/profile?display=api-tokens to generate a token if you don't have one already). Entering an empty token will clear any stored API token in this session: ")
 	apiTokens, _ := reader.ReadString('\n')
 
 	return strings.TrimSpace(apiTokens)
@@ -105,11 +105,11 @@ func main() {
 		{
 			Name:    "configure",
 			Aliases: []string{"c"},
-			Usage:   "Add your Dexecure api-tokens",
+			Usage:   "Add your Dexecure API token",
 			Action: func(c *cli.Context) error {
 				apiTokens := credentials()
 				saveToken(apiTokens)
-				fmt.Println("API tokens saved successfully")
+				fmt.Println("API token saved successfully.")
 				return nil
 			},
 		},
@@ -193,7 +193,7 @@ func main() {
 								if c.Args().Len() > 0 {
 									id = c.Args().First()
 									id = strings.TrimSpace(id)
-									if IsValidUUID(id) == false {
+									if isValidUUID(id) == false {
 										fmt.Println("Please enter a valid website ID. It must be a valid UUID")
 										return nil
 									}
@@ -361,7 +361,7 @@ func main() {
 							id = strings.TrimSpace(id)
 						}
 
-						if IsValidUUID(id) == false {
+						if isValidUUID(id) == false {
 							fmt.Println("Please enter a valid website ID. It must be a valid UUID")
 							return nil
 						}
@@ -423,7 +423,7 @@ func main() {
 						fmt.Scanln(&websiteID)
 						websiteID = strings.TrimSpace(websiteID)
 
-						if IsValidUUID(websiteID) == false {
+						if isValidUUID(websiteID) == false {
 							fmt.Println("Please enter a valid website ID. It must be a valid UUID")
 							return nil
 						}
@@ -471,7 +471,7 @@ func main() {
 							id = strings.TrimSpace(id)
 						}
 
-						if IsValidUUID(id) == false {
+						if isValidUUID(id) == false {
 							fmt.Println("Please enter a valid domain ID. It must be a valid UUID")
 							return nil
 						}
@@ -529,7 +529,7 @@ func main() {
 									fmt.Print("Enter a Website ID: ")
 									fmt.Scanln(&id)
 								}
-								if IsValidUUID(id) == false {
+								if isValidUUID(id) == false {
 									fmt.Println("Please enter a valid website ID. It must be a valid UUID")
 									return nil
 								}
@@ -658,7 +658,7 @@ func main() {
 									fmt.Print("Domain ID: ")
 									fmt.Scanln(&id)
 								}
-								if IsValidUUID(id) == false {
+								if isValidUUID(id) == false {
 									fmt.Println("Please enter a valid domain ID. It must be a valid UUID")
 									return nil
 								}
@@ -725,7 +725,7 @@ func main() {
 							id = strings.TrimSpace(id)
 						}
 
-						if IsValidUUID(id) == false {
+						if isValidUUID(id) == false {
 							fmt.Println("Please enter a valid domain ID. It must be a valid UUID")
 							return nil
 						}
