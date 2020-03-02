@@ -305,21 +305,21 @@ func main() {
 					Action: func(c *cli.Context) error {
 
 						fmt.Print("Enter the url you want to add: ")
-						var url string
-						fmt.Scanln(&url)
-						url = strings.TrimSpace(url)
+						var websiteURL string
+						fmt.Scanln(&websiteURL)
+						websiteURL = strings.TrimSpace(websiteURL)
 
 						fmt.Print(`Enter website type (magento|wordpress|shopify|none): `)
-						var urlType string
-						fmt.Scanln(&urlType)
-						urlType = strings.TrimSpace(urlType)
+						var websiteType string
+						fmt.Scanln(&websiteType)
+						websiteType = strings.TrimSpace(websiteType)
 
 						fmt.Print("Enter website Name: ")
 						var websiteName string
 						fmt.Scanln(&websiteName)
 						websiteName = strings.TrimSpace(websiteName)
 
-						wr := &WebsiteRequest{URL: url, UrlType: urlType, WebsiteName: websiteName}
+						wr := &WebsiteRequest{WebsiteURL: websiteURL, WebsiteType: websiteType, WebsiteName: websiteName}
 						bdy, er := json.Marshal(wr)
 						if er != nil {
 							fmt.Println(er)

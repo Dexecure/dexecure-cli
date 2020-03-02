@@ -48,13 +48,13 @@ type DomainResponse struct {
 }
 
 type UsageResponse struct {
-	Status int         `json:"status"`
+	Status int `json:"status"`
 	Error  struct {
 		Code        int    `json:"code"`
 		Description string `json:"description"`
 		Parameter   string `json:"parameter"`
 	} `json:"error"`
-	Data   struct {
+	Data struct {
 		Bandwidth     int `json:"bandwidth"`
 		Requests      int `json:"requests"`
 		Distributions int `json:"distributions"`
@@ -62,16 +62,16 @@ type UsageResponse struct {
 }
 
 type UserResponse struct {
-	Status int         `json:"status"`
+	Status int `json:"status"`
 	Error  struct {
 		Code        int    `json:"code"`
 		Description string `json:"description"`
 		Parameter   string `json:"parameter"`
 	} `json:"error"`
-	Data   struct {
+	Data struct {
 		ID                      string      `json:"id"`
 		FirstName               string      `json:"firstName"`
-		LastName                string `json:"lastName"`
+		LastName                string      `json:"lastName"`
 		Email                   string      `json:"email"`
 		Role                    string      `json:"role"`
 		IsEnterprise            int         `json:"isEnterprise"`
@@ -128,13 +128,13 @@ type WebsiteResponse struct {
 }
 
 type WebsitesResponse struct {
-	Status int         `json:"status"`
+	Status int `json:"status"`
 	Error  struct {
 		Code        int    `json:"code"`
 		Description string `json:"description"`
 		Parameter   string `json:"parameter"`
 	} `json:"error"`
-	Data   []struct {
+	Data []struct {
 		WebsiteURL  string `json:"website_url"`
 		WebsiteType string `json:"website_type"`
 		WebsiteName string `json:"website_name"`
@@ -143,8 +143,8 @@ type WebsitesResponse struct {
 }
 
 type WebsiteRequest struct {
-	URL         string `json:"url"`
-	UrlType     string `json:"urlType"`
+	WebsiteURL  string `json:"website_url"`
+	WebsiteType string `json:"website_type"`
 	WebsiteName string `json:"website_name"`
 }
 
