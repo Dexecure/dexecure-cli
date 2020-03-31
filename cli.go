@@ -316,7 +316,10 @@ func main() {
 
 						fmt.Print("Enter website Name: ")
 						var websiteName string
-						fmt.Scanln(&websiteName)
+						scanner := bufio.NewScanner(os.Stdin)
+						if scanner.Scan() {
+							websiteName = scanner.Text()
+						}
 						websiteName = strings.TrimSpace(websiteName)
 
 						wr := &WebsiteRequest{WebsiteURL: websiteURL, WebsiteType: websiteType, WebsiteName: websiteName}
