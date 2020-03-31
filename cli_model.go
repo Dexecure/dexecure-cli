@@ -120,9 +120,9 @@ type WebsiteResponse struct {
 	Status int         `json:"status"`
 	Error  interface{} `json:"error"`
 	Data   struct {
-		WebsiteURL  string `json:"website_url"`
-		WebsiteType string `json:"website_type"`
-		WebsiteName string `json:"website_name"`
+		WebsiteURL  string `json:"websiteUrl"`
+		WebsiteType string `json:"websiteType"`
+		WebsiteName string `json:"websiteName"`
 		ID          string `json:"id"`
 	} `json:"data"`
 }
@@ -135,17 +135,17 @@ type WebsitesResponse struct {
 		Parameter   string `json:"parameter"`
 	} `json:"error"`
 	Data []struct {
-		WebsiteURL  string `json:"website_url"`
-		WebsiteType string `json:"website_type"`
-		WebsiteName string `json:"website_name"`
+		WebsiteURL  string `json:"websiteUrl"`
+		WebsiteType string `json:"websiteType"`
+		WebsiteName string `json:"websiteName"`
 		ID          string `json:"id"`
 	} `json:"data"`
 }
 
 type WebsiteRequest struct {
-	WebsiteURL  string `json:"website_url"`
-	WebsiteType string `json:"website_type"`
-	WebsiteName string `json:"website_name"`
+	WebsiteURL  string `json:"websiteUrl"`
+	WebsiteType string `json:"websiteType"`
+	WebsiteName string `json:"websiteName"`
 }
 
 type Data struct {
