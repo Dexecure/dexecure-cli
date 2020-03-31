@@ -11,7 +11,7 @@ import (
 
 	"github.com/parnurzeal/gorequest"
 	"github.com/tucnak/store"
-	"gopkg.in/urfave/cli.v2"
+	"github.com/urfave/cli/v2"
 )
 
 var apiEndPoint = "https://dao-api.dexecure.com/api/v1/"
@@ -96,7 +96,7 @@ func main() {
 	app.Usage = "Interact with your Dexecure account"
 	app.Version = "0.0.3"
 	app.Copyright = "Dexecure PTE LTD."
-	app.EnableShellCompletion = true
+	app.EnableBashCompletion = true
 
 	// config management
 	store.Init("dexecure")
