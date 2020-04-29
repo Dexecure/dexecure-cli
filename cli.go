@@ -94,7 +94,7 @@ func main() {
 
 	app.Name = "Dexecure CLI"
 	app.Usage = "Interact with your Dexecure account"
-	app.Version = "0.0.4"
+	app.Version = "0.0.5"
 	app.Copyright = "Dexecure PTE LTD."
 	app.EnableBashCompletion = true
 
@@ -143,7 +143,7 @@ func main() {
 
 				res, _, err = gorequest.
 					New().
-					Get(apiEndPoint+"user/usage").
+					Get(apiEndPoint+"team/usage").
 					Set("Authorization", getToken()).
 					End()
 
