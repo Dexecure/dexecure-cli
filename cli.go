@@ -82,7 +82,7 @@ func parseResponse(body string, res gorequest.Response) Response {
 func credentials() string {
 	reader := bufio.NewReader(os.Stdin)
 
-	fmt.Print("Enter your api token (Visit https://app.dexecure.com/profile?display=api-tokens to generate a token if you don't have one already). Entering an empty token will clear any stored API token in this session: ")
+	fmt.Print("Enter your api token (Visit https://app.dexecure.com/api-tokens to generate a token if you don't have one already). Entering an empty token will clear any stored API token in this session: ")
 	apiTokens, _ := reader.ReadString('\n')
 
 	return strings.TrimSpace(apiTokens)
